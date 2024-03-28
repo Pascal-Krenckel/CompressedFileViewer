@@ -1,0 +1,47 @@
+﻿<Window x:Class="CompressedFileViewer.Windows.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CompressedFileViewer.Windows"
+        mc:Ignorable="d" WindowStyle="ToolWindow" ResizeMode="NoResize"
+        Title="SettingsDialog" Width="718" Height="607">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <CheckBox Grid.ColumnSpan="3" Name="chk_decompressAll" Content="Try to decompress all files" Height="18" VerticalAlignment="Top" Margin="10,10,10,0">
+            <CheckBox.ToolTip>
+                <TextBlock Text="If set, all files will be decompressed regardless of the file extension. (like .gz)" />
+            </CheckBox.ToolTip>
+        </CheckBox>
+        <CheckBox Margin="10,45,10,0" Name="chk_updateStatusBar" Content="Show compression name in status bar">
+            <CheckBox.ToolTip>
+                <TextBlock>
+                    If true, the status bar will show the algorithm name and the encoding instead just the encoding. <LineBreak />
+                    If false, the plugin will not change the statusbar.
+                </TextBlock>
+            </CheckBox.ToolTip>
+        </CheckBox>
+        <TextBlock Grid.ColumnSpan="3" Text="Compression Algorithms" Margin="10,70,10,0" Height="19" VerticalAlignment="Top" />
+        <ListView Grid.ColumnSpan="3" Margin="10,90,10,103" Name="lstAlg" SelectionMode="Single">
+            <ListView.ToolTip>
+                <TextBlock>
+                        Changes the order of the compression algorithmns.
+                        <LineBreak/>
+                        Only effects 'Toogle Compression'. To disable a compression remove the file association, too.
+                </TextBlock>
+            </ListView.ToolTip>
+        </ListView>
+
+        <Button Content="UP" Margin="55,0,54,74" Height="24" VerticalAlignment="Bottom" Click="Up"/>
+        <Button Grid.Column="1" Content="DOWN" Margin="55,0,55,74" Height="24" VerticalAlignment="Bottom" Click="Down"/>
+        <Button Grid.Column="2" Content="Settings" Margin="49,0,60,74" Click="ComprSettingsClicked" Height="24" VerticalAlignment="Bottom" />
+
+        <Button Content="OK" Margin="55,0,54,13" Height="24" VerticalAlignment="Bottom" Click="OK"/>
+        <Button Grid.Column="1" Content="Default" Margin="55,0,55,13" Height="24" VerticalAlignment="Bottom" Click="Default"/>
+        <Button Grid.Column="2" Content="Cancel" Margin="49,0,60,13" Height="24" VerticalAlignment="Bottom" Click="Cancel"/>
+    </Grid>
+</Window>

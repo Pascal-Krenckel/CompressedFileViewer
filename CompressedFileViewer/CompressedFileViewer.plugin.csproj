@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="$(ProjectDir)Properties\NppDir.props" />
+	<Import Project="$(ProjectDir)Properties\Zip.targets" />
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<Nullable>enable</Nullable>
+		<EnableDynamicLoading>true</EnableDynamicLoading>
+		<Platforms>x64;x86</Platforms>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<DnneNativeBinaryName>CompressedFileViewer</DnneNativeBinaryName>
+		<RootNamespace>CompressedFileViewer</RootNamespace>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="publish\**" />
+	  <EmbeddedResource Remove="publish\**" />
+	  <None Remove="publish\**" />
+	  <Page Remove="publish\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="icons\gzip-filled16.png" />
+	 
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="icons\gzip-filled16.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DNNE" Version="2.0.6" />
+		<PackageReference Include="SharpZipLib" Version="1.4.2" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Windows\BZip2SettingsDialog.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="Windows\DecompressDialog.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	</ItemGroup>
+    
+	<PropertyGroup Condition="'$(Platform)'=='x86'">
+		<RuntimeIdentifier>win-x86</RuntimeIdentifier>
+		<PlatformTarget>x86</PlatformTarget>
+		<NppDir>$(NppDir86)</NppDir>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Platform)'=='x64'">
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<PlatformTarget>x64</PlatformTarget>
+		<NppDir>$(NppDir64)</NppDir>
+	</PropertyGroup>
+
+	<Target Name="CopyFiles" AfterTargets="PostBuildEvent" Condition=" Exists('$(NppDir)\plugins') AND '$(NppDir)' != '' ">
+		<ItemGroup>
+			<Binaries Include="$(ProjectDir)$(OutDir)**\*.*" />
+		</ItemGroup>
+		<RemoveDir Directories="$(NppDir)\plugins\CompressedFileViewer" /> <!-- Remove old files -->
+		<MakeDir Directories="$(NppDir)\plugins\CompressedFileViewer" />
+		<Copy SourceFiles="@(Binaries)" DestinationFolder="$(NppDir)\plugins\CompressedFileViewer" />
+	</Target>
+
+</Project>
