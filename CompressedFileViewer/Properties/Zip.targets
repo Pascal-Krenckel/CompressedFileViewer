@@ -1,0 +1,10 @@
+<Project>
+  <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
+	
+  <Target Name="ZipOutDirectory" AfterTargets="Build">
+	  <MakeDir Directories="$(ProjectDir)\publish\"/>
+	  <ZipDirectory
+				SourceDirectory="$(OutputPath)"
+				DestinationFile="$(ProjectDir)publish\$(SolutionName)$(Platform.ToUpper()).zip" Overwrite="true" />
+  </Target>
+</Project>
