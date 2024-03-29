@@ -11,6 +11,17 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<DnneNativeBinaryName>CompressedFileViewer</DnneNativeBinaryName>
 		<RootNamespace>CompressedFileViewer</RootNamespace>
+		<PackageId>CompressedFileViewer</PackageId>
+		<Authors>Pascal Krenckel</Authors>
+		<Product>CompressedFileViewer</Product>
+		<Description>This is a Notepad++ plugin to open and store files in gzip, bzip2, xz or zstd format.</Description>
+		<Copyright>Copyright © Pascal Krenckel 2024</Copyright>
+		<PackageProjectUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<FileVersion>1.0.0</FileVersion>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="publish\**" />
