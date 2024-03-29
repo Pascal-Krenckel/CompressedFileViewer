@@ -18,10 +18,12 @@
 		<Copyright>Copyright © Pascal Krenckel 2024</Copyright>
 		<PackageProjectUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<AssemblyVersion>1.0.0</AssemblyVersion>
-		<FileVersion>1.0.0</FileVersion>
+		<RepositoryType>git</RepositoryType>		
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageIcon>gzip-filled.png</PackageIcon>
+		<ApplicationIcon>icons\gzip.ico</ApplicationIcon>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="publish\**" />
@@ -32,6 +34,7 @@
 
 	<ItemGroup>
 	  <None Remove="icons\gzip-filled16.png" />
+	  <None Remove="icons\gzip.png" />
 	 
 	</ItemGroup>
 
@@ -46,12 +49,23 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Resource Include="icons\gzip.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Windows\BZip2SettingsDialog.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
 	  <Compile Update="Windows\DecompressDialog.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="icons\gzip-filled.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
     
 	<PropertyGroup Condition="'$(Platform)'=='x86'">
