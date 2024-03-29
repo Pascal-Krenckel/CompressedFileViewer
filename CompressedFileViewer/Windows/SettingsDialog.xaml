@@ -37,9 +37,45 @@
             </ListView.ToolTip>
         </ListView>
 
-        <Button Content="UP" Margin="55,0,54,74" Height="24" VerticalAlignment="Bottom" Click="Up"/>
-        <Button Grid.Column="1" Content="DOWN" Margin="55,0,55,74" Height="24" VerticalAlignment="Bottom" Click="Down"/>
-        <Button Grid.Column="2" Content="Settings" Margin="49,0,60,74" Click="ComprSettingsClicked" Height="24" VerticalAlignment="Bottom" />
+        <Button Content="UP" Margin="55,0,54,74" Height="24" VerticalAlignment="Bottom" Click="Up">
+            <Button.Style>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedIndex,ElementName=lstAlg}" Value="-1">
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                            <Setter Property="Button.ToolTip" Value="Please select an algorithm. (Click on the empty space on the right side of its name to noch (un)check it."/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding SelectedIndex,ElementName=lstAlg}" Value="0">
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <Button Grid.Column="1" Content="DOWN" Margin="55,0,55,74" Height="24" VerticalAlignment="Bottom" Click="Down">
+            <Button.Style>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedIndex,ElementName=lstAlg}" Value="-1">
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                            <Setter Property="Button.ToolTip" Value="Please select an algorithm. (Click on the empty space on the right side of its name to noch (un)check it."/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <Button Grid.Column="2" Content="Settings" Margin="49,0,60,74" Click="ComprSettingsClicked" Height="24" VerticalAlignment="Bottom">
+            <Button.Style>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedIndex,ElementName=lstAlg}" Value="-1">
+                            <Setter Property="Button.IsEnabled" Value="False"/>
+                            <Setter Property="Button.ToolTip" Value="Please select an algorithm. (Click on the empty space on the right side of its name to noch (un)check it."/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
 
         <Button Content="OK" Margin="55,0,54,13" Height="24" VerticalAlignment="Bottom" Click="OK"/>
         <Button Grid.Column="1" Content="Default" Margin="55,0,55,13" Height="24" VerticalAlignment="Bottom" Click="Default"/>
