@@ -24,8 +24,8 @@ public class Plugin
         {
             switch (notification.Header.Code)
             {
-                case (uint)NppMsg.NPPN_FILEOPENED:                    
-                    FileHelper.OpenFile(notification); 
+                case (uint)NppMsg.NPPN_FILEOPENED:
+                    FileHelper.OpenFile(notification);
                     break;
                 case (uint)NppMsg.NPPN_FILEBEFORESAVE:
                     Logging.Log("Event: FileBeforeSave");
@@ -36,15 +36,15 @@ public class Plugin
                     FileHelper.FileSaved(notification);
                     break;
                 case (uint)NppMsg.NPPN_FILECLOSED:
-                    FileHelper.Remove(notification.Header.IdFrom);                   
+                    FileHelper.Remove(notification.Header.IdFrom);
                     break;
-                case (uint)NppMsg.NPPN_BUFFERACTIVATED:                    
+                case (uint)NppMsg.NPPN_BUFFERACTIVATED:
                     UpdateStatusbar(notification.Header.IdFrom);
                     UpdateCommandChecked(notification.Header.IdFrom);
                     break;
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Logging.Log(ex);
         }
@@ -53,12 +53,13 @@ public class Plugin
 
     internal static void PluginInit()
     {
-        Logging.Log("Plugin Started");
+        Logging.Log("Begin: Plugin Init");
         // you have to specify at least one command, no icon needed
         LoadSettings();
-      
+
 
         AddCommands();
+        Logging.Log("End: Plugin Init");
     }
 
     private static void AddCommands()
@@ -85,12 +86,12 @@ public class Plugin
 
                 compressor = FileTracker.GetCompressor(bufferId) == compressor ? null : compressor; // if already compressed (same compressor) disable compression
 
-                CompressionHelper.SetCompression(FileTracker,bufferId,compressor);
+                CompressionHelper.SetCompression(FileTracker, bufferId, compressor);
 
                 UpdateCommandChecked(bufferId);
                 UpdateStatusbar(bufferId, true);
             });
-        
+
     }
 
 
@@ -100,13 +101,13 @@ public class Plugin
         IntPtr bufferId = NppGateway.GetCurrentBufferId();
         var compressor = Preferences.GetNextCompressor(FileTracker.GetCompressor(bufferId)?.AlgorithmName, Preferences.GetCompressionBySuffix(NppGateway.GetFullPathFromBufferId(bufferId)));
 
-        CompressionHelper.SetCompression(FileTracker,bufferId, compressor);
+        CompressionHelper.SetCompression(FileTracker, bufferId, compressor);
 
         UpdateCommandChecked(bufferId);
         UpdateStatusbar(bufferId, true);
     }
 
- 
+
 
     private static void UpdateStatusbar(IntPtr from, bool resetStatusbar = false)
     {
@@ -190,7 +191,11 @@ public class Plugin
         string initFilePath = NppGateway.GetPluginsConfigDir();
         _ = Directory.CreateDirectory(initFilePath);
         initFilePath = Path.Combine(initFilePath, PluginName + ".config");
-        try { Preferences = Preferences.Deserialize(initFilePath); } catch (Exception ex) { Logging.Log(ex); Preferences = Preferences.Default; }
+        try
+        {
+            Preferences = Preferences.Deserialize(initFilePath); Logging.Log("Finished loading settings");
+        }
+        catch (Exception ex) { Logging.Log(ex); Preferences = Preferences.Default; }
     }
     private static void SaveSettings()
     {
