@@ -1,7 +1,7 @@
 {
   "profiles": {
     
-    "Profil \"1\"": {
+    "CompressedFileViewer": {
       "commandName": "Executable",
       "executablePath": "$(NppDir)\\notepad++.exe"
       
