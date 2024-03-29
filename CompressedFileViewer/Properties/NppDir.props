@@ -1,7 +1,7 @@
 <Project>
   <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
   <PropertyGroup>
-	  <NppDir86>$(MSBuildProgramFiles32)\Notepad++\</NppDir86>
+	  <NppDir32>$(MSBuildProgramFiles32)\Notepad++\</NppDir32>
 	  <NppDir64>$(ProgramW6432)\Notepad++\</NppDir64>
   </PropertyGroup>
 </Project>
