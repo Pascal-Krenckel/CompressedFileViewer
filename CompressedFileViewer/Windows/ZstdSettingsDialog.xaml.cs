@@ -83,7 +83,7 @@ public partial class ZstdSettingsDialog : Window, ISettingsDialog
 
     private void Default(object sender, RoutedEventArgs e)
     {
-        var settings = Preferences.Default.GZipSettings;
+        var settings = Preferences.Default.ZstdSettings;
         txtBufferSize.Text = settings!.BufferSize.ToString();
         txtComprLevel.Text = settings.CompressionLevel.ToString();
         lstSuffix.Items.Clear();
