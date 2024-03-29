@@ -17,7 +17,7 @@ namespace CompressedFileViewer;
 /// </summary>
 public class Preferences
 {
-    public const int VERSION = 1;
+    public const int VERSION = 2;
 
     #region Properties
     /// <summary>
@@ -121,6 +121,10 @@ public class Preferences
             pref.BZip2Settings = Default.BZip2Settings;
             pref.GZipSettings = Default.GZipSettings;
         }
+        if(pref.Version < 2)
+        {
+            pref.ZstdSettings = Default.ZstdSettings;
+        }
 
         return pref;
     }
@@ -159,6 +163,7 @@ public class Preferences
     public BZip2Settings BZip2Settings { get; set; } = new();
     public GZipSettings GZipSettings { get; set; } = new();
 
+    public ZstdSettings ZstdSettings { get; set; } = new();
     #endregion
 
     /// <summary>
@@ -199,6 +204,7 @@ public class Preferences
             preferences.EnabledCompressionAlgorithms = preferences.SupportedCompressionAlgorithms.Select(c => c.AlgorithmName).ToList();
             preferences.GZipSettings.Extensions.AddRange([".gz", ".gzip"]);
             preferences.BZip2Settings.Extensions.AddRange([".bz2", ".bzip2"]);
+            preferences.ZstdSettings.Extensions.Add(".zst");
             return preferences;
         }
     }

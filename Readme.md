@@ -90,8 +90,6 @@ The Icons were created by Freepik from www.flaticon.com.
 
 This project uses SharpZipLib: https://github.com/icsharpcode/SharpZipLib
 
-(not version 1: )
-
 This project uses Joveler.Compression.XZ: https://github.com/ied206/Joveler.Compression
 
 This project uses ZstdSharp: https://github.com/oleg-st/ZstdSharp

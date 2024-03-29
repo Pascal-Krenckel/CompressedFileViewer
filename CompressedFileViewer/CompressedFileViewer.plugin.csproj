@@ -46,6 +46,7 @@
 		<PackageReference Include="DNNE" Version="2.0.6" />
 		<PackageReference Include="SharpZipLib" Version="1.4.2" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.3" />
+		<PackageReference Include="ZstdSharp.Port" Version="0.7.6" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -57,6 +58,9 @@
 	    <SubType>Code</SubType>
 	  </Compile>
 	  <Compile Update="Windows\DecompressDialog.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="Windows\ZstdSettingsDialog.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
 	</ItemGroup>
