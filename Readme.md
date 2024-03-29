@@ -1,4 +1,4 @@
-<img src="./icons/gzip.png" style="float:left;" width=64  />
+<img src="./CompressedFileViewer/icons/gzip.png" style="float:left;" width=64  />
 
 # CompressedFileViewer
 A Notepad++ plugin to open and save files in the gzip or bzip2 format.
