@@ -125,6 +125,10 @@ public class Preferences
         {
             pref.ZstdSettings = Default.ZstdSettings;
         }
+        if(pref.Version < 3)
+        {
+            pref.XZSettings = Default.XZSettings;
+        }
 
         return pref;
     }
@@ -145,7 +149,7 @@ public class Preferences
     /// </summary>
     /// <param name="path">The file path to get the compression settings for.</param>
     /// <returns>The compression settings for the file.</returns>
-    public CompressionSettings? GetCompressionBySuffix(string path)
+    public CompressionSettings? GetCompressionBySuffix(string? path)
     {
         return SupportedCompressionAlgorithms.FirstOrDefault(comp => comp.Extensions.Any(ext => path?.EndsWith(ext, StringComparison.OrdinalIgnoreCase) ?? false));
     }
@@ -162,8 +166,8 @@ public class Preferences
     #region Compression Algorithms
     public BZip2Settings BZip2Settings { get; set; } = new();
     public GZipSettings GZipSettings { get; set; } = new();
-
     public ZstdSettings ZstdSettings { get; set; } = new();
+    public XZSettings XZSettings { get; set; } = new();
     #endregion
 
     /// <summary>
@@ -205,6 +209,7 @@ public class Preferences
             preferences.GZipSettings.Extensions.AddRange([".gz", ".gzip"]);
             preferences.BZip2Settings.Extensions.AddRange([".bz2", ".bzip2"]);
             preferences.ZstdSettings.Extensions.Add(".zst");
+            preferences.XZSettings.Extensions.Add(".xz");
             return preferences;
         }
     }
