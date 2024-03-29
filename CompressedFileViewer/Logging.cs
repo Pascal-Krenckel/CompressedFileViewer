@@ -42,7 +42,7 @@ public static class Logging
         Windows.Log.LogEntries.Add(logTree.ToLogEntry(DateTime.Now));
     }
 
-    internal static void Log(string message, string subMessage)
+    public static void Log(string message, string subMessage)
     {
         var entry = new LogTree(message);
         _ = entry.AppendMessage(subMessage);
