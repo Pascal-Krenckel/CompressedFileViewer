@@ -69,7 +69,7 @@ Copy:
 
 To compile this plugin with Visual Studio, you need .Net 8 (6 or 7 might also work).
 See DNNE (https://github.com/AaronRobinsonMSFT/DNNE) for additional requirements.
-Change the NppDir32/64 to point to the right Npp-Folder and make soure you have write access to the plugin dir.
+Change NppDir32/64 to the correct Npp-Folder and make soure you have write access to the plugin dir.
 
 ### Implementing Addtional Algorithms
 * Implementing CompressionSettings
