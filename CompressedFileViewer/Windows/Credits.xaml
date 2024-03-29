@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CompressedFileViewer.Windows"
         mc:Ignorable="d"
-        Title="Credits"  ResizeMode="NoResize" WindowStyle="ToolWindow" Height="291" Width="632">
+        Title="Credits"  ResizeMode="NoResize" WindowStyle="ToolWindow" Height="291" Width="632" SizeToContent="WidthAndHeight">
     <TextBlock FontSize="16" xml:space="preserve" Margin="10">Project GitHub: <Hyperlink>https://github.com/Pascal-Krenckel/NppGZipFileViewer</Hyperlink>
         
 Notepad++: <Hyperlink>https://notepad-plus-plus.org/</Hyperlink>
@@ -17,10 +17,9 @@ This project uses the notepad++ plugin template from <Hyperlink>https://github.c
 The Icons were created by Freepik from <Hyperlink>www.flaticon.com</Hyperlink>.
 
 This plugin uses SharpZipLib: <Hyperlink>https://github.com/icsharpcode/SharpZipLib</Hyperlink>
-<!--
-This plugin uses Joveler.Compression.XZ: https://github.com/ied206/Joveler.Compression
 
-This project uses ZstdSharp: https://github.com/oleg-st/ZstdSharp
--->
+This plugin uses Joveler.Compression.XZ: <Hyperlink>https://github.com/ied206/Joveler.Compression</Hyperlink>
+
+This project uses ZstdSharp: <Hyperlink>https://github.com/oleg-st/ZstdSharp</Hyperlink>
     </TextBlock>
 </Window>
