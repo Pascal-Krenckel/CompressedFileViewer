@@ -31,7 +31,8 @@
                 <TextBlock>
                         Changes the order of the compression algorithmns.
                         <LineBreak/>
-                        Only effects 'Toogle Compression'. To disable a compression remove the file association, too.
+                        Only effects 'Toogle Compression'. To disable a compression remove the file association, too.<LineBreak/>
+                        To select an algorithm,click on the empty space on the right side of its name or you will toogle the checkbox.
                 </TextBlock>
             </ListView.ToolTip>
         </ListView>
