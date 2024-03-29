@@ -57,7 +57,7 @@
 	<PropertyGroup Condition="'$(Platform)'=='x86'">
 		<RuntimeIdentifier>win-x86</RuntimeIdentifier>
 		<PlatformTarget>x86</PlatformTarget>
-		<NppDir>$(NppDir86)</NppDir>
+		<NppDir>$(NppDir32)</NppDir>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Platform)'=='x64'">
