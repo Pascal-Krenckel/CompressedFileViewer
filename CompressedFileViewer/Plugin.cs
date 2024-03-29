@@ -208,7 +208,7 @@ public class Plugin
 
     internal static void CleanUp()
     {
-        SaveSettings();
+        //SaveSettings(); Not Needed, settings are saved when changed. See ShowSettings()
     }
 
 
