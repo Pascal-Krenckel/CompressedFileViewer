@@ -1,0 +1,38 @@
+﻿<Window x:Class="CompressedFileViewer.Windows.AboutDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CompressedFileViewer.Windows"
+        mc:Ignorable="d" Name="window" ResizeMode="NoResize" WindowStyle="ToolWindow"
+        Title="AboutDialog" Height="350" Width="512" Icon="/CompressedFileViewer.plugin;component/icons/gzip.png">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Image x:Name="IconDisplay" Source="{Binding Icon,ElementName=window}"/>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding ProductName}" Grid.Row="0" Margin="5"/>
+            <TextBlock Text="{Binding Version}" Grid.Row="1" Margin="5"/>
+            <TextBlock Text="{Binding Copyright}" Grid.Row="2" Margin="5"/>
+            <TextBlock Text="{Binding Company}" Grid.Row="3" Margin="5"/>
+            <ScrollViewer Grid.Row="4" Margin="5" HorizontalScrollBarVisibility="Disabled">
+                <TextBlock Text="{Binding Description,Mode=OneWay}" TextWrapping="Wrap"  />
+            </ScrollViewer>            
+        </Grid>
+        <Button Content="OK" Grid.Row="5" HorizontalAlignment="Right" Width="100" Margin="10" Click="Button_Click" Grid.Column="1"/>
+    </Grid>
+</Window>

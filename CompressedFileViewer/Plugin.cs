@@ -74,6 +74,7 @@ public class Plugin
         PluginBase.AddCommand("Show Log", () => new Windows.Log().ShowDialog());
         PluginBase.AddMenuSeperator();
         PluginBase.AddCommand("Settings", ShowSettings);
+        PluginBase.AddCommand("About", () => new Windows.AboutDialog().ShowDialog());
         PluginBase.AddCommand("Credits", () => new Windows.Credits().ShowDialog());
         PluginBase.AddMenuSeperator();
         foreach (var compr in Preferences.SupportedCompressionAlgorithms)
