@@ -1,7 +1,7 @@
 <Project>
   <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
 	
-  <Target Name="ZipOutDirectory" AfterTargets="Build">
+  <Target Name="ZipOutDirectory" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
 	  <MakeDir Directories="$(ProjectDir)\publish\"/>
 	  <ZipDirectory
 				SourceDirectory="$(OutputPath)"
