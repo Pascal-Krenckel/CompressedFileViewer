@@ -77,7 +77,7 @@ public partial class SettingsDialog : Window
                     Content = alg.AlgorithmName,
                     IsChecked = preferences.EnabledCompressionAlgorithms.Contains(alg.AlgorithmName),
                     IsEnabled = alg.IsSupported,
-                    ToolTip = alg.IsSupported ? String.Empty : "The algorithm is not supported.\nCheck the log there might be more information.",
+                    ToolTip = alg.IsSupported ? null : "The algorithm is not supported.\nCheck the log there might be more information.",
                 });
         }
     }
