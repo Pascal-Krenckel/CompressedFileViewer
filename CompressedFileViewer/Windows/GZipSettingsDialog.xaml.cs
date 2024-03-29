@@ -21,7 +21,7 @@ public partial class GZipSettingsDialog : Window, ISettingsDialog
 {
     static GZipSettingsDialog()
     {
-        SettingsDialog.RegistSettingsDialog("gzip", typeof(GZipSettingsDialog));
+        SettingsDialog.RegistSettingsDialog(GZipSettings.ALGORITHM_NAME, typeof(GZipSettingsDialog));
     }
 
     public GZipSettingsDialog()
