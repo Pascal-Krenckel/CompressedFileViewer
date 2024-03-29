@@ -19,7 +19,7 @@
 		<PackageProjectUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>		
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<AssemblyVersion>2.0.0.0</AssemblyVersion>
 		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageIcon>gzip-filled.png</PackageIcon>
