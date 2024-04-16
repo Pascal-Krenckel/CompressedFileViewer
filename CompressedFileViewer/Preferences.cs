@@ -17,7 +17,7 @@ namespace CompressedFileViewer;
 /// </summary>
 public class Preferences
 {
-    public const int VERSION = 2;
+    public const int VERSION = 4;
 
     #region Properties
     /// <summary>
@@ -129,6 +129,10 @@ public class Preferences
         {
             pref.XZSettings = Default.XZSettings;
         }
+        if(pref.Version < 4)
+        {
+            pref.BrotliSettings = Default.BrotliSettings;
+        }
 
         return pref;
     }
@@ -168,6 +172,8 @@ public class Preferences
     public GZipSettings GZipSettings { get; set; } = new();
     public ZstdSettings ZstdSettings { get; set; } = new();
     public XZSettings XZSettings { get; set; } = new();
+
+    public BrotliSettings BrotliSettings { get; set; } = new();
     #endregion
 
     /// <summary>
@@ -210,6 +216,7 @@ public class Preferences
             preferences.BZip2Settings.Extensions.AddRange([".bz2", ".bzip2"]);
             preferences.ZstdSettings.Extensions.Add(".zst");
             preferences.XZSettings.Extensions.Add(".xz");
+            preferences.BrotliSettings.Extensions.Add(".br");
             return preferences;
         }
     }

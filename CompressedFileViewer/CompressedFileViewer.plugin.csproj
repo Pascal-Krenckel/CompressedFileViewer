@@ -55,6 +55,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Windows\BrotliSettings.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
 	  <Compile Update="Windows\BZip2SettingsDialog.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
