@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CompressedFileViewer.Windows"
         mc:Ignorable="d" WindowStyle="ToolWindow" ResizeMode="NoResize"
-        Title="SettingsDialog" Width="718" Height="607">
+        Title="SettingsDialog" Width="725" Height="607">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -17,7 +17,7 @@
                 <TextBlock Text="If set, all files will be decompressed regardless of the file extension. (like .gz)" />
             </CheckBox.ToolTip>
         </CheckBox>
-        <CheckBox Margin="10,45,10,0" Name="chk_updateStatusBar" Content="Show compression name in status bar">
+        <CheckBox Margin="10,45,10,0" Name="chk_updateStatusBar" Content="Show compression name in status bar" Grid.ColumnSpan="3" VerticalAlignment="Top">
             <CheckBox.ToolTip>
                 <TextBlock>
                     If true, the status bar will show the algorithm name and the encoding instead just the encoding. <LineBreak />
