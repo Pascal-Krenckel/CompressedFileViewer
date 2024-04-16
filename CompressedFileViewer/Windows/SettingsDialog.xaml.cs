@@ -70,6 +70,7 @@ public partial class SettingsDialog : Window
             preferences = Clone(value);
             chk_decompressAll.IsChecked = preferences.DecompressAll;
             chk_updateStatusBar.IsChecked = preferences.UpdateStatusBar;
+            lstAlg.Items.Clear();
             foreach (var alg in preferences.CompressionAlgorithms)
                 _ = lstAlg.Items.Add(new CheckBox()
                 {
