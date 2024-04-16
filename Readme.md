@@ -3,7 +3,7 @@
 # CompressedFileViewer
 A Notepad++ plugin to open and save compressed files.
 It's written in `C#` with Visual Studio for [.Net 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
-Don't change the encoding (`UTF-8`, `ANSI`, etc.) of a zipped file. Change the file to uncompressed, then change the encoding and toggle compression on again.
+Don't change the encoding (`UTF-8`, `ANSI`, etc.) of a compressed file. Change the file to uncompressed, then change the encoding and toggle compression on again.
 
 ## Compression algorithms
 * GZip (`.gz`, `.gzip`)
