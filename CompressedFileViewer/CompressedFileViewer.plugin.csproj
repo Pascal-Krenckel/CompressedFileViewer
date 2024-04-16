@@ -14,12 +14,12 @@
 		<PackageId>CompressedFileViewer</PackageId>
 		<Authors>Pascal Krenckel</Authors>
 		<Product>CompressedFileViewer</Product>
-		<Description>This is a Notepad++ plugin to open and store files in gzip, bzip2, xz or zstd format.</Description>
+		<Description>This is a Notepad++ plugin to open and store files in gzip, bzip2, xz, zstd or brotli format.</Description>
 		<Copyright>Copyright © Pascal Krenckel 2024</Copyright>
 		<PackageProjectUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>		
-		<AssemblyVersion>3.0.0.0</AssemblyVersion>
+		<AssemblyVersion>4.0.0.0</AssemblyVersion>
 		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageIcon>gzip-filled.png</PackageIcon>
