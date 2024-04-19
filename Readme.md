@@ -30,10 +30,17 @@ Make sure .Net 8 is installed.
 This plugin has two basic settings.
 1. `Try to decompress all files`: If set, the plugin will try to decompress all files regardless of the extension. All decompressed files will be tracked and - if saved - automatically compressed. (If the path is still the same)
    Only active algorithms will be used. 
-2. `Compression algorithms`: The ordered list of the compression algorithms. This does not affect file detection or 'decompress all'. It only affects the behaviour of the icon or 'Toggle Compression'. When clicking on the icon based on the suffix, the appropriate compression will be chosen.  Afterwards, you can iterate through all algorithms in the list by clicking again.
+2. `Compression algorithms`: The ordered list of the compression algorithms. This does not affect file detection or `Try decompress all`. It only affects the behaviour of the icon or `Toggle Compression`. When clicking on the icon based on the suffix, the appropriate compression will be chosen.  Afterwards, you can iterate through all algorithms in the list by clicking again.
     * Is enabled: If unchecked, the algorithm will be disabled. No files will be compressed or uncompressed using this algorithm. To update the toolbar you need to restart npp.
     * Is active: If an algorithm is not active, it will not be used with the setting `Try decompress all files`. Additionally, using the toolbar icon will only switch to this algorithm if it has the correct suffix. Files with the correct suffix will still automatically be (de)compressed when opened/saved.
-
+      
+      That means:
+      You must restart Npp to update the menu commands.
+      Disabled algorithms will not be used.
+      Enabled algorithms will be used for files with matching extensions or for explicitly selected files (by using the menu).
+      If `Try decompress all` is checked, a file with an extension that does not match an enabled algorithm will still be decompressed if possible, but only active algorithms are tried.
+      Using the toolbar icon or `Toggle Compression` will switch through all active algorithms including the compression based on the extension even if not active.
+ 
 Selecting an algorithm and clicking on 'Settings' allows you to manage the algorithm-specific settings.
 1. 'Suffixes': The list of suffixes that should automatically be decompressed. If a file is saved with such a suffix, it will also be compressed.
 2. Other algorithm-specific settings

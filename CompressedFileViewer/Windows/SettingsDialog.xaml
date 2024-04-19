@@ -29,10 +29,11 @@
         <ListView Grid.ColumnSpan="3" Margin="10,90,10,103" Name="lstAlg" SelectionMode="Single">
             <ListView.ToolTip>
                 <TextBlock>
-                        Changes the order of the compression algorithmns.
-                        <LineBreak/>
-                        Only effects 'Toogle Compression'. To disable a compression remove the file association, too.<LineBreak/>
-                        To select an algorithm,click on the empty space on the right side of its name or you will toogle the checkbox.
+                        You must restart Npp to update the menu commands. <LineBreak/>
+                        Disabled algorithms will no be used.<LineBreak />
+                        Enabled algorithms will be used for files with matching extension or for explicitly selected files (by using the menu). <LineBreak />
+                        If 'Try decompress all' is checked, files which extension does not match a enabled algorithm will still be decompressed if possiblem but only active algorithms are tried. <LineBreak/>
+                        Using the toolbar icon or 'Toogle Compressedion' will switch through all active algorithms including the compression based on the extension even if not active.
                 </TextBlock>
             </ListView.ToolTip>
             <ListView.ItemContainerStyle>
