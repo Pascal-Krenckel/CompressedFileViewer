@@ -30,10 +30,10 @@
             <ListView.ToolTip>
                 <TextBlock>
                         You must restart Npp to update the menu commands. <LineBreak/>
-                        Disabled algorithms will no be used.<LineBreak />
+                        Disabled algorithms will not be used.<LineBreak />
                         Enabled algorithms will be used for files with matching extension or for explicitly selected files (by using the menu). <LineBreak />
-                        If 'Try decompress all' is checked, files which extension does not match a enabled algorithm will still be decompressed if possiblem but only active algorithms are tried. <LineBreak/>
-                        Using the toolbar icon or 'Toogle Compressedion' will switch through all active algorithms including the compression based on the extension even if not active.
+                        If 'Try decompress all' is checked, files whose extension does not match an enabled algorithm will still be decompressed if possible, but only active algorithms are tried. <LineBreak/>
+                        Using the toolbar icon or 'Toggle Compression' will switch through all active algorithms including the compression based on the extension even if not active.
                 </TextBlock>
             </ListView.ToolTip>
             <ListView.ItemContainerStyle>
@@ -47,7 +47,7 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
-                    <GridViewColumn Header="Is Enabled">
+                    <GridViewColumn Header="Is Enabled" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate DataType="local:AlgEntry">
                                 <CheckBox IsChecked="{Binding IsEnabled}">
@@ -67,7 +67,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Is Active">
+                    <GridViewColumn Header="Is Active" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate DataType="local:AlgEntry">
                                 <CheckBox IsChecked="{Binding IsActive}">
