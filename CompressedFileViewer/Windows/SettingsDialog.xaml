@@ -35,6 +35,82 @@
                         To select an algorithm,click on the empty space on the right side of its name or you will toogle the checkbox.
                 </TextBlock>
             </ListView.ToolTip>
+            <ListView.ItemContainerStyle>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger  Binding="{Binding IsSupported}" Value="False">
+                            <Setter Property="Control.IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView AllowsColumnReorder="False">
+                    <GridViewColumn Header="Is Enabled">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="local:AlgEntry">
+                                <CheckBox IsChecked="{Binding IsEnabled}">
+                                    <CheckBox.ToolTip>
+                                        Enable or disable a compression algorithm. You need to restart Notepad++ to update the toolbar.
+                                    </CheckBox.ToolTip>
+                                    <CheckBox.Style>
+                                        <Style>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSupported}" Value="False">
+                                                    <Setter Property="Control.IsEnabled" Value="False" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </CheckBox.Style>
+                                </CheckBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Is Active">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="local:AlgEntry">
+                                <CheckBox IsChecked="{Binding IsActive}">
+                                    <CheckBox.ToolTip>
+                                        If checked the algorithm will be used when switching through the compression algorithms by using the toolbar icon.
+                                    </CheckBox.ToolTip>
+                                    <CheckBox.Style>
+                                        <Style>
+                                            <Style.Triggers>
+                                                <DataTrigger  Binding="{Binding IsEnabled}" Value="False">
+                                                    <Setter Property="Control.IsEnabled" Value="False" />
+                                                </DataTrigger>
+                                                <DataTrigger  Binding="{Binding IsSupported}" Value="False">
+                                                    <Setter Property="Control.IsEnabled" Value="False" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </CheckBox.Style>
+                                </CheckBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Algorithm">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}">
+                                    <TextBlock.Style>
+                                        <Style>
+                                            <Style.Triggers>
+                                                <DataTrigger  Binding="{Binding IsEnabled}" Value="False">
+                                                    <Setter Property="Control.Opacity" Value="0.5" />
+                                                </DataTrigger>
+                                                <DataTrigger  Binding="{Binding IsSupported}" Value="False">
+                                                    <Setter Property="Control.Opacity" Value="0.5" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
         </ListView>
 
         <Button Content="UP" Margin="55,0,54,74" Height="24" VerticalAlignment="Bottom" Click="Up">

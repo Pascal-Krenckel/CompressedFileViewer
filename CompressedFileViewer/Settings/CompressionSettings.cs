@@ -16,7 +16,7 @@ public abstract class CompressionSettings
     /// <summary>
     /// List of file extensions associated with this compression algorithm
     /// </summary>
-    public List<string> Extensions { get; set; } = new List<string>();
+    public List<string> Extensions { get; set; } = [];
 
     /// <summary>
     /// The name of the compression algorithm
@@ -64,6 +64,15 @@ public abstract class CompressionSettings
     /// Whether the compression algorithm is supported or not.
     /// </summary>
     public abstract bool IsSupported { get; }
+
+    public bool IsEnabled { get; set; } = false;
+
+    public bool IsActive { get; set; } = true;
+
+    public int SortOrder { get; set; } = int.MaxValue;
+
     public override string ToString() => AlgorithmName;
+
+    public abstract void Initialize();
 
 }

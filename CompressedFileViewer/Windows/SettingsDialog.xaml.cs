@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -59,10 +61,18 @@ public partial class SettingsDialog : Window
         {
             preferences.DecompressAll = chk_decompressAll.IsChecked == true;
             preferences.UpdateStatusBar = chk_updateStatusBar.IsChecked == true;
-            preferences.EnabledCompressionAlgorithms.Clear();
-            foreach (CheckBox chkCmpr in lstAlg.Items)
-                if (chkCmpr.IsChecked == true && chkCmpr.IsEnabled)
-                    preferences.EnabledCompressionAlgorithms.Add(chkCmpr.Name);
+            
+            for(int i = 0; i < lstAlg.Items.Count; i++)
+            {
+                AlgEntry compr = (AlgEntry)lstAlg.Items[i];
+                var settings = preferences.GetCompressionByName(compr.Name)!;
+                settings.IsActive = compr.IsActive;
+                if (!settings.IsEnabled && compr.IsEnabled)
+                    settings.Initialize();
+                settings.IsEnabled = compr.IsEnabled;
+                settings.SortOrder = i;
+            }
+           
             return preferences;
         }
         set
@@ -72,14 +82,7 @@ public partial class SettingsDialog : Window
             chk_updateStatusBar.IsChecked = preferences.UpdateStatusBar;
             lstAlg.Items.Clear();
             foreach (var alg in preferences.CompressionAlgorithms)
-                _ = lstAlg.Items.Add(new CheckBox()
-                {
-                    Name = alg.AlgorithmName,
-                    Content = alg.AlgorithmName,
-                    IsChecked = preferences.EnabledCompressionAlgorithms.Contains(alg.AlgorithmName),
-                    IsEnabled = alg.IsSupported,
-                    ToolTip = alg.IsSupported ? null : "The algorithm is not supported.\nCheck the log there might be more information.",
-                });
+                _ = lstAlg.Items.Add(new AlgEntry(alg.AlgorithmName, alg.IsEnabled, alg.IsSupported, alg.IsActive));
         }
     }
 
@@ -98,12 +101,12 @@ public partial class SettingsDialog : Window
         {
             if (lstAlg.SelectedItem != null)
             {
-                string name = ((CheckBox)lstAlg.SelectedItem).Name;
-                if (!typeDict.ContainsKey(name))
+                string name = ((AlgEntry)lstAlg.SelectedItem).Name;
+                if (!typeDict.TryGetValue(name, out Type? value))
                     _ = MessageBox.Show($"No dialog registerd with {name}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 else
                 {
-                    Type windowType = typeDict[name];
+                    Type windowType = value;
                     Window window = (Window)Activator.CreateInstance(windowType)!;
                     ((ISettingsDialog)window).CompressionSettings = preferences.CompressionAlgorithms.Where(compr => compr.AlgorithmName == name).First();
                     _ = window.ShowDialog();
@@ -161,4 +164,42 @@ public partial class SettingsDialog : Window
         DialogResult = false;
         Close();
     }
+}
+
+
+public class AlgEntry : INotifyPropertyChanged, IEquatable<AlgEntry?>
+{
+    private string name;
+    private bool isEnabled;
+    private bool isSupported;
+    private bool isActive;
+
+    public AlgEntry(string name, bool isEnabled, bool isSupported, bool isActive)
+    {
+        this.name = name;
+        this.isEnabled = isEnabled;
+        this.isSupported = isSupported;
+        this.isActive = isActive;
+    }
+
+    public string Name { get => name; set => SetValue(ref name,value); }
+    public bool IsEnabled { get => isEnabled; set => SetValue(ref isEnabled,value); }
+    public bool IsSupported { get => isSupported; set => SetValue(ref isSupported, value); }
+    public bool IsActive { get => isActive; set => SetValue(ref isActive, value); }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public override bool Equals(object? obj) => Equals(obj as AlgEntry);
+    public bool Equals(AlgEntry? other) => other is not null && name == other.name;
+    public override int GetHashCode() => HashCode.Combine(name);
+    private void RaisePropertyChanged([CallerMemberName]string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    private void SetValue<T>(ref T property,T value, [CallerMemberName]string? propertyName = null)
+    {
+        property = value;
+        RaisePropertyChanged(propertyName);
+    }
+
+    public static bool operator ==(AlgEntry? left, AlgEntry? right) => EqualityComparer<AlgEntry>.Default.Equals(left, right);
+    public static bool operator !=(AlgEntry? left, AlgEntry? right) => !(left == right);
 }

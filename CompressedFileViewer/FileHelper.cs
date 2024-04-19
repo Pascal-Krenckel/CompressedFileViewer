@@ -44,7 +44,7 @@ internal class FileHelper
         if (Preferences.DecompressAll && gzContentStream.Length > 0)
         {
             var subTree = logEntry.AppendMessage("Trying all supported compressions");
-            foreach (var compression in Preferences.SupportedCompressionAlgorithms)
+            foreach (var compression in Preferences.ActiveCompressionAlgorithms)
             {
                 _ = gzContentStream.Seek(0, SeekOrigin.Begin);
                 var enc = CompressionHelper.TryDecompress(gzContentStream, compression);
