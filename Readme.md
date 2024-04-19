@@ -2,7 +2,7 @@
 
 # CompressedFileViewer
 A Notepad++ plugin to open and save compressed files.
-It's written in `C#` with Visual Studio for [.Net 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
+It's written in `C#` with Visual Studio for .Net 8.
 Don't change the encoding (`UTF-8`, `ANSI`, etc.) of a compressed file. Change the file to uncompressed, then change the encoding and toggle compression on again.
 
 ## Compression algorithms
@@ -11,39 +11,43 @@ Don't change the encoding (`UTF-8`, `ANSI`, etc.) of a compressed file. Change t
 * Zstd (`.zstd`)
 * XZ (`.xz`)
 * Brotli (`.br`)
+
 ## How to use
 
 ### Dll-Files
 Download the zip file depending on your architecture. 
-Unpack the zip file copy all files into `%NotepadDir%/plugins/CompressedFileViewer`.
-Make sure [.Net 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is installed.
+Unpack the zip file and copy all files into `%NotepadDir%/plugins/CompressedFileViewer`.
+Make sure .Net 8 is installed.
 
 ### Terminus:
-1. tracked file: A tracked file is a file that was decompressed or is selected manually for compression. The Icon and Menu Entry will be checked for this file.
-2. excluded file: A file for which the compression was manually disabled.
-3. ignored file: neither tracked for compression nor excluded.
+1. Tracked file: A file that has been decompressed or manually selected for compression. The icon and menu entry will be checked for this file.
+2. Excluded file: A file for which compression has been manually disabled.
+3. Ignored file: A file that is neither tracked for compression nor excluded.
 4. gz: Any file with a suffix matching one in the settings.
 5. non-gz: Any other file
 
 ### Settings
-This plugin has two settings.
-1. `Try to decompress all files`: If set the plugin will try to decompress all files regardless of the extension. All decompressed files will be tracked and if saved automatically compressed. (If the path is still the same)
-2. `Compression algorithms`: The ordered list of the compression algorithms. This does not affect file detection or 'decompress all'. It only affects the behaviour of the icon or 'Toogle Compression'. When clicking on the icon based on the suffix the appropriate compression will be chosen.  Afterwards you can iterate through all algorithms in the list by clicking again.
+This plugin has two basic settings.
+1. `Try to decompress all files`: If set, the plugin will try to decompress all files regardless of the extension. All decompressed files will be tracked and - if saved - automatically compressed. (If the path is still the same)
+   Only active algorithms will be used. 
+2. `Compression algorithms`: The ordered list of the compression algorithms. This does not affect file detection or 'decompress all'. It only affects the behaviour of the icon or 'Toggle Compression'. When clicking on the icon based on the suffix, the appropriate compression will be chosen.  Afterwards, you can iterate through all algorithms in the list by clicking again.
+    * Is enabled: If unchecked, the algorithm will be disabled. No files will be compressed or uncompressed using this algorithm. To update the toolbar you need to restart npp.
+    * Is active: If an algorithm is not active, it will not be used with the setting `Try decompress all files`. Additionally, using the toolbar icon will only switch to this algorithm if it has the correct suffix. Files with the correct suffix will still automatically be (de)compressed when opened/saved.
 
-Selecting a algorithm and clicking on 'Settings' allows to manage the algorithm specific settings.
-1. 'Suffixes': The list of suffixes that schould automatically be decompressed. If a file is saved with such suffix it will also be compressed.
-2. Other algorithm specific settings
+Selecting an algorithm and clicking on 'Settings' allows you to manage the algorithm-specific settings.
+1. 'Suffixes': The list of suffixes that should automatically be decompressed. If a file is saved with such a suffix, it will also be compressed.
+2. Other algorithm-specific settings
 
 ### Commands
-In the menubar there are 6 Commands:
-1. `Toggle Compression` (same as clicking on the icon): Changes the compression algorithm used when storing this file. You can iteratre through different algorithms again. The order is dertemined by the order in the settings. If the file has a algorithm specific suffix it will select this algorithm first. By click again after the last algorithm was selected, the file compression will be disable for this file.
+In the menubar, there are 8+ Commands:
+1. `Toggle Compression` (same as clicking on the icon): Changes the compression algorithm used when storing this file. You can iterate through different algorithms again. The order is determined by the order in the settings. If the file has an algorithm-specific suffix, it will select this algorithm first. By clicking again after the last algorithm was selected, the file compression will be disabled for this file.
 2. `Compress`: Compresses the current file text in the editor. 
 3. `Decompress`: Decompresses the current text in the editor.
 4. `Show Log`: Opens the log window.
 5. `Settings`: Opens the settings dialog.
 6. `About`: Opens the about dialog.
 7. `Credits`: Opens the credits dialog.
-9. '*Compression Algorithm*': Sets the compression for this specific file or removes it.
+8. '*Compression Algorithm*': Sets the compression for this specific file or removes it.
 
 ### (De)Compression-File-Rules
 On Open:
@@ -53,15 +57,15 @@ On Open:
 Save (same path):
 1. Any tracked file will be compressed.
 2. Any excluded file won't be compressed.
-3. Any ignored file will be compressed if the suffix matches an algorithm suffix. (Won't happen since this files would be tracked)
+3. Any ignored file will be compressed if the suffix matches an algorithm suffix. (Won't happen since these files would be tracked)
 
-Save (diffrent path):
-Npp will tell the plugin the old path when notifing `FileBeforeSaved`. If based on the suffix the compression toggles it might be saved two times.
+Save (different path):
+Npp will tell the plugin the old path when notifying `FileBeforeSaved`. If based on the suffix the compression toggles it might be saved two times.
 1. from suffix type to other suffix type: This file will be compressed based on the new suffix.
 2. same suffix type:<br/>
-   1. If tracked, save compressed..
+   1. If tracked, save compressed.
    2. If excluded, save uncompressed.
-   3. If neither go by suffix type.
+   3. If neither, go by suffix type.
    
 Copy:
 1. Will always be stored as seen in the editor since npp won't raise a `FileBeforeSave`/`FileSaved` event.
@@ -70,9 +74,9 @@ Copy:
 
 To compile this plugin with Visual Studio, you need .Net 8 (6 or 7 might also work).
 See DNNE (https://github.com/AaronRobinsonMSFT/DNNE) for additional requirements.
-Change `NppDir32/64` to the correct Npp-Folders and make soure you have write access to the plugin dir.
+Change `NppDir32/64` to the correct Npp-Folders and make sure you have write access to the plugin dir.
 
-### Implementing Addtional Algorithms
+### Implementing Additional Algorithms
 * Implementing CompressionSettings
 * Preferences:
    * Incrementing Version
