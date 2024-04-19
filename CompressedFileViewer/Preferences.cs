@@ -36,23 +36,27 @@ public class Preferences
     public bool UpdateStatusBar { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the list of enabled compression algorithms.
-    /// </summary>
-    public List<string> EnabledCompressionAlgorithms { get; set; } = new List<string>();
-
-    /// <summary>
     /// Gets the compression algorithms available.
     /// </summary>
     public IEnumerable<CompressionSettings> CompressionAlgorithms => GetType().GetProperties()
                             .Where(m => m.PropertyType.IsSubclassOf(typeof(CompressionSettings)))
-                            .Select(m => (CompressionSettings)m.GetValue(this)!);
+                            .Select(m => (CompressionSettings)m.GetValue(this)!)
+                            .OrderBy((settings) => settings.SortOrder);
+
+    /// <summary>
+    /// Gets the active compression algorithms that the plugin should switch through
+    /// </summary>
+    public IEnumerable<CompressionSettings> ActiveCompressionAlgorithms => SupportedCompressionAlgorithms.Where(comp => comp.IsActive);
+
+    /// <summary>
+    /// Gets the enabled compression algorithms.
+    /// </summary>
+    public IEnumerable<CompressionSettings> EnabledCompressionAlgorithms => CompressionAlgorithms.Where(comp => comp.IsEnabled);
 
     /// <summary>
     /// Gets the compression algorithms that are supported.
     /// </summary>
-    public IEnumerable<CompressionSettings> SupportedCompressionAlgorithms => GetType().GetProperties()
-                            .Where(m => m.PropertyType.IsSubclassOf(typeof(CompressionSettings)))
-                            .Select(m => (CompressionSettings)m.GetValue(this)!).Where(alg => alg.IsSupported);
+    public IEnumerable<CompressionSettings> SupportedCompressionAlgorithms => EnabledCompressionAlgorithms.Where(alg => alg.IsSupported);
     #endregion
 
     #region Constructor
@@ -155,7 +159,7 @@ public class Preferences
     /// <returns>The compression settings for the file.</returns>
     public CompressionSettings? GetCompressionBySuffix(string? path)
     {
-        return SupportedCompressionAlgorithms.FirstOrDefault(comp => comp.Extensions.Any(ext => path?.EndsWith(ext, StringComparison.OrdinalIgnoreCase) ?? false));
+        return EnabledCompressionAlgorithms.FirstOrDefault(comp => comp.Extensions.Any(ext => path?.EndsWith(ext, StringComparison.OrdinalIgnoreCase) ?? false));
     }
 
     /// <summary>
@@ -172,9 +176,12 @@ public class Preferences
     public GZipSettings GZipSettings { get; set; } = new();
     public ZstdSettings ZstdSettings { get; set; } = new();
     public XZSettings XZSettings { get; set; } = new();
-
     public BrotliSettings BrotliSettings { get; set; } = new();
     #endregion
+
+    public CompressionSettings? GetCompressionByName(string name) => GetType().GetProperties()
+                            .Where(m => m.PropertyType.IsSubclassOf(typeof(CompressionSettings)))
+                            .Select(m => (CompressionSettings)m.GetValue(this)!).FirstOrDefault(s => s.AlgorithmName == name);
 
     /// <summary>
     /// Gets the next enabled compression algoritm.
@@ -184,23 +191,18 @@ public class Preferences
     /// <returns>The next compression algorithm</returns>
     public CompressionSettings? GetNextCompressor(string? compressionAlgorithm, CompressionSettings? compressionBySuffix)
     {
-        string cAlg;
         if (string.IsNullOrWhiteSpace(compressionAlgorithm))
-            cAlg = compressionBySuffix?.AlgorithmName ?? EnabledCompressionAlgorithms.FirstOrDefault(String.Empty);
+            return compressionBySuffix ?? ActiveCompressionAlgorithms.FirstOrDefault();
         else
-            cAlg = (compressionAlgorithm != compressionBySuffix?.AlgorithmName ?
+            return (compressionAlgorithm != compressionBySuffix?.AlgorithmName ?
 
-                EnabledCompressionAlgorithms
-                .SkipWhile(alg => alg != compressionAlgorithm)
+                ActiveCompressionAlgorithms
+                .SkipWhile(alg => alg.AlgorithmName != compressionAlgorithm)
                 .Skip(1)
                 :
-                EnabledCompressionAlgorithms
+                ActiveCompressionAlgorithms
                 )
-                .FirstOrDefault(algName => algName != compressionBySuffix?.AlgorithmName, String.Empty);
-
-
-        return SupportedCompressionAlgorithms.FirstOrDefault(comp => comp.AlgorithmName == cAlg);
-
+                .FirstOrDefault(alg => alg != compressionBySuffix);
     }
 
     /// <summary>
@@ -211,7 +213,6 @@ public class Preferences
         get
         {
             Preferences preferences = new(false);
-            preferences.EnabledCompressionAlgorithms = preferences.SupportedCompressionAlgorithms.Select(c => c.AlgorithmName).ToList();
             preferences.GZipSettings.Extensions.AddRange([".gz", ".gzip"]);
             preferences.BZip2Settings.Extensions.AddRange([".bz2", ".bzip2"]);
             preferences.ZstdSettings.Extensions.Add(".zst");

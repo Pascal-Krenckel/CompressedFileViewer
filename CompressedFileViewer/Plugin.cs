@@ -78,11 +78,12 @@ public class Plugin
         PluginBase.AddCommand("About", () => new Windows.AboutDialog().ShowDialog());
         PluginBase.AddCommand("Credits", () => new Windows.Credits().ShowDialog());
         PluginBase.AddMenuSeperator();
-        foreach (var compr in Preferences.SupportedCompressionAlgorithms)
+
+        foreach (var compr in Preferences.EnabledCompressionAlgorithms)
             PluginBase.AddCommand(compr.AlgorithmName, () =>
             {
                 IntPtr bufferId = NppGateway.GetCurrentBufferId();
-                var compressor = Preferences.SupportedCompressionAlgorithms.FirstOrDefault(alg => alg.AlgorithmName == compr.AlgorithmName);
+                var compressor = Preferences.EnabledCompressionAlgorithms.FirstOrDefault(alg => alg.AlgorithmName == compr.AlgorithmName);
 
                 compressor = FileTracker.GetCompressor(bufferId) == compressor ? null : compressor; // if already compressed (same compressor) disable compression
 
@@ -135,7 +136,7 @@ public class Plugin
     {
         NppGateway.SetMenuItemCheck(0, FileTracker.IsIncluded(from));
         var compr = FileTracker.GetCompressor(from);
-        foreach (var posCompr in Preferences.SupportedCompressionAlgorithms)
+        foreach (var posCompr in Preferences.EnabledCompressionAlgorithms)
             NppGateway.SetMenuItemCheck(posCompr.AlgorithmName, compr?.AlgorithmName == posCompr.AlgorithmName);
     }
 
@@ -143,7 +144,7 @@ public class Plugin
     {
         Windows.CompressDialog compressForm = new()
         {
-            CompressionSettings = Preferences.SupportedCompressionAlgorithms.ToArray(),
+            CompressionSettings = Preferences.EnabledCompressionAlgorithms.ToArray(),
         };
         if (compressForm.ShowDialog() == true && compressForm.SelectedCompression != null)
         {
@@ -162,7 +163,7 @@ public class Plugin
     {
         Windows.DecompressDialog decompressForm = new()
         {
-            CompressionSettings = Preferences.SupportedCompressionAlgorithms.ToArray(),
+            CompressionSettings = Preferences.EnabledCompressionAlgorithms.ToArray(),
         };
         if (decompressForm.ShowDialog() == true && decompressForm.SelectedCompression != null)
         {
@@ -193,9 +194,14 @@ public class Plugin
         initFilePath = Path.Combine(initFilePath, PluginName + ".config");
         try
         {
-            Preferences = Preferences.Deserialize(initFilePath); Logging.Log("Finished loading settings");
+            Preferences = Preferences.Deserialize(initFilePath); Logging.Log("Finished loading settings");            
         }
-        catch (Exception ex) { Logging.Log(ex); Preferences = Preferences.Default; }
+        catch (Exception ex)
+        {
+            Logging.Log(ex);
+            Preferences = Preferences.Default;            
+        }
+        foreach (var alg in Preferences.EnabledCompressionAlgorithms) alg.Initialize();
     }
     private static void SaveSettings()
     {

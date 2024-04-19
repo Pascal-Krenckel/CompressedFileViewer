@@ -11,21 +11,7 @@ public class ZstdSettings : CompressionSettings
 {
     public static readonly string ALGORITHM_NAME = "zstd";
 
-    static bool isSupported;
-    static ZstdSettings()
-    {
-        isSupported = true;
-        try
-        {
-            using var compressor = new ZstdSharp.Compressor();
-            using var decompressor = new ZstdSharp.Decompressor();
-        }
-        catch(Exception ex) 
-        {
-            Logging.Log(ex);
-            isSupported = false;
-        }
-    }
+    static bool isSupported = true;
 
     public int CompressionLevel { get; set; } = 11;
     public int BufferSize { get; set; } = 1024 * 1024;
@@ -43,5 +29,20 @@ public class ZstdSettings : CompressionSettings
     {
         ZstdSharp.DecompressionStream decompressionStream = new(inStream,BufferSize,true);
         return decompressionStream;
+    }
+
+    public override void Initialize()
+    {
+        isSupported = true;
+        try
+        {
+            using var compressor = new ZstdSharp.Compressor();
+            using var decompressor = new ZstdSharp.Decompressor();
+        }
+        catch (Exception ex)
+        {
+            Logging.Log(ex);
+            isSupported = false;
+        }
     }
 }

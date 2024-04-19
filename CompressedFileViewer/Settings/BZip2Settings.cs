@@ -25,4 +25,6 @@ public class BZip2Settings : CompressionSettings
 
     public override Stream GetDecompressionStream(Stream inStream) => new BZip2InputStream(inStream)
     { IsStreamOwner = false };
+
+    public override void Initialize() { }
 }

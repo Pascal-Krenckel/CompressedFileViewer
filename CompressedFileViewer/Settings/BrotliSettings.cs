@@ -32,4 +32,6 @@ public class BrotliSettings : CompressionSettings
         BrotliStream brotliStream= new(inStream,CompressionMode.Decompress,true);
         return brotliStream;
     }
+
+    public override void Initialize() { }
 }

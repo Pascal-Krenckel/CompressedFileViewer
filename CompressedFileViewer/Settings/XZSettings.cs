@@ -12,35 +12,7 @@ namespace CompressedFileViewer.Settings;
 public class XZSettings : CompressionSettings
 {
     public static readonly string ALGORITHM_NAME = "xz";
-    static bool isSupported = false;
-    static XZSettings()
-    {
-        try
-        {
-            string currentDir = System.IO.Path.GetDirectoryName( System.Reflection.Assembly.GetExecutingAssembly().Location)!;
-            string libPath = "";
-            /*switch (RuntimeInformation.ProcessArchitecture)
-            {
-                case Architecture.X86:
-                    libPath = System.IO.Path.Combine(currentDir, "x86", "liblzma.dll");
-                    break;
-                case Architecture.X64:
-                    libPath = System.IO.Path.Combine(currentDir, "x64", "liblzma.dll");
-                    break;
-                case Architecture.Arm64:
-                    libPath = System.IO.Path.Combine(currentDir, "arm64", "liblzma.dll");
-                    break;
-            }*/
-            libPath = System.IO.Path.Combine(currentDir, "liblzma.dll");
-            XZInit.GlobalInit(libPath);
-            Logging.Log("Finished loading liblzma.dll", $"Version: {XZInit.VersionString()}");
-            isSupported = true;
-        } catch (Exception ex)
-        {
-            isSupported = false;
-            Logging.Log(ex);            
-        }
-    }
+    static bool isSupported = true;
 
     public override string AlgorithmName => ALGORITHM_NAME;
 
@@ -87,5 +59,35 @@ public class XZSettings : CompressionSettings
         if (!MultiThreading)
             return new XZStream(inStream, DecompressOptions);
         return new XZStream(inStream, DecompressOptions, ThreadDecompressOptions);
+    }
+
+    public override void Initialize()
+    {
+        try
+        {
+            string currentDir = System.IO.Path.GetDirectoryName( System.Reflection.Assembly.GetExecutingAssembly().Location)!;
+            string libPath = "";
+            /*switch (RuntimeInformation.ProcessArchitecture)
+            {
+                case Architecture.X86:
+                    libPath = System.IO.Path.Combine(currentDir, "x86", "liblzma.dll");
+                    break;
+                case Architecture.X64:
+                    libPath = System.IO.Path.Combine(currentDir, "x64", "liblzma.dll");
+                    break;
+                case Architecture.Arm64:
+                    libPath = System.IO.Path.Combine(currentDir, "arm64", "liblzma.dll");
+                    break;
+            }*/
+            libPath = System.IO.Path.Combine(currentDir, "liblzma.dll");
+            XZInit.GlobalInit(libPath);
+            Logging.Log("Finished loading liblzma.dll", $"Version: {XZInit.VersionString()}");
+            isSupported = true;
+        }
+        catch (Exception ex)
+        {
+            isSupported = false;
+            Logging.Log(ex);
+        }
     }
 }

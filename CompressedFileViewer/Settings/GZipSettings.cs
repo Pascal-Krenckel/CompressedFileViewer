@@ -12,27 +12,12 @@ namespace CompressedFileViewer.Settings;
 public class GZipSettings : CompressionSettings
 {
     public static readonly string ALGORITHM_NAME = "gzip";
-    static GZipSettings()
-    {
-        try
-        {
-            using GZipOutputStream outStream = new(Stream.Null);
-            using GZipInputStream inStream = new(Stream.Null);
-            isSupported = true;
-        }
-        catch (Exception ex)
-        {
-            isSupported = false;
-            Logging.Log(ex);
-        }
-    }
 
     public int CompressionLevel { get; set; } = 9;
     public int BufferSize { get; set; } = 1024;
 
     public override string AlgorithmName => ALGORITHM_NAME;
-    private static readonly bool isSupported;
-    public override bool IsSupported => isSupported;
+    public override bool IsSupported => true;
 
     public override Stream GetCompressionStream(Stream outStream)
     {
@@ -48,4 +33,6 @@ public class GZipSettings : CompressionSettings
     {
         IsStreamOwner = false
     };
+
+    public override void Initialize() { }
 }
