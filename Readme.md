@@ -18,6 +18,7 @@ Don't change the encoding (`UTF-8`, `ANSI`, etc.) of a compressed file. Change t
 Download the zip file depending on your architecture. 
 Unpack the zip file and copy all files into `%NotepadDir%/plugins/CompressedFileViewer`.
 Make sure .Net 8 is installed.
+Go to settings to enable the different algorithms, since all are disabled by default.
 
 ### Terminus:
 1. Tracked file: A file that has been decompressed or manually selected for compression. The icon and menu entry will be checked for this file.
