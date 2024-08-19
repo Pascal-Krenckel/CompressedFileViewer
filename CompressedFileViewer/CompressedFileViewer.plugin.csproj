@@ -46,8 +46,8 @@
 		<PackageReference Include="DNNE" Version="2.0.6" />
 		<PackageReference Include="Joveler.Compression.XZ" Version="4.3.0" />
 		<PackageReference Include="SharpZipLib" Version="1.4.2" />
-		<PackageReference Include="System.Drawing.Common" Version="8.0.3" />
-		<PackageReference Include="ZstdSharp.Port" Version="0.7.6" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.8" />
+		<PackageReference Include="ZstdSharp.Port" Version="0.8.1" />
 	</ItemGroup>
 
 	<ItemGroup>
