@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace CompressedFileViewer.Settings;
 
@@ -30,7 +25,7 @@ public abstract class CompressionSettings
     /// <param name="outStream">The stream the compressed data is written to.</param>
     public void Compress(Stream inStream, Stream outStream)
     {
-        using var compressionStream = GetCompressionStream(outStream);
+        using Stream compressionStream = GetCompressionStream(outStream);
         inStream.CopyTo(compressionStream);
     }
 
@@ -41,7 +36,7 @@ public abstract class CompressionSettings
     /// <param name="outStream">The stream the uncompressed data is written to.</param>
     public void Decompress(Stream inStream, Stream outStream)
     {
-        using var compressionStream = GetDecompressionStream(inStream);
+        using Stream compressionStream = GetDecompressionStream(inStream);
         compressionStream.CopyTo(outStream);
     }
 

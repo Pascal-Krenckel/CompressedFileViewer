@@ -1,53 +1,49 @@
 ﻿using CompressedFileViewer.PluginInfrastructure;
 using CompressedFileViewer.Settings;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CompressedFileViewer;
 internal class FileHelper
 {
-    static Dictionary<IntPtr, Position> cursorPosition = new Dictionary<IntPtr, Position>();
-    static Dictionary<IntPtr, CompressionSettings?> compressionBeforeSave = new Dictionary<IntPtr, CompressionSettings?>();
+    private static readonly Dictionary<IntPtr, Position> cursorPosition = [];
+    private static readonly Dictionary<IntPtr, CompressionSettings?> compressionBeforeSave = [];
     private static Preferences Preferences => Plugin.Preferences;
     private static FileTracker FileTracker => Plugin.FileTracker;
     private static NotepadPPGateway NppGateway => Plugin.NppGateway;
 
     public static void OpenFile(ScNotification notification)
     {
-        var path = NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom);
-        var sourceCompression = Preferences.GetCompressionBySuffix(NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom));
-        using var gzContentStream = CompressionHelper.GetContentStream(notification, path);
-        Logging.LogTree logEntry = new Logging.LogTree($"File opened: {path}");
+        StringBuilder path = NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom);
+        CompressionSettings? sourceCompression = Preferences.GetCompressionBySuffix(NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom));
+        using MemoryStream gzContentStream = CompressionHelper.GetContentStream(notification, path);
+        Logging.LogTree logEntry = new($"File opened: {path}");
         if (sourceCompression != null)
         {
-            var subTree = logEntry.AppendMessage(sourceCompression.AlgorithmName);
+            Logging.LogTree subTree = logEntry.AppendMessage(sourceCompression.AlgorithmName);
             if (gzContentStream.Length == 0) // Empty file:
             {
                 Logging.Log(logEntry);
-                var encoding = CompressionHelper.ResetEncoding();
-                FileTracker.Include(notification.Header.IdFrom, path, encoding, sourceCompression);                
+                Encoding encoding = CompressionHelper.ResetEncoding();
+                FileTracker.Include(notification.Header.IdFrom, path, encoding, sourceCompression);
                 return;
             }
-            var enc = CompressionHelper.TryDecompress(gzContentStream, sourceCompression);
+            Encoding? enc = CompressionHelper.TryDecompress(gzContentStream, sourceCompression);
             if (enc != null)
             { // was able to decompress
                 Logging.Log(logEntry);
                 FileTracker.Include(notification.Header.IdFrom, path, enc, sourceCompression);
                 return;
             }
-            _ = subTree.AppendMessage("Failed to decompress");           
+            _ = subTree.AppendMessage("Failed to decompress");
         }
         if (Preferences.DecompressAll && gzContentStream.Length > 0)
         {
-            var subTree = logEntry.AppendMessage("Trying all supported compressions");
-            foreach (var compression in Preferences.ActiveCompressionAlgorithms)
+            Logging.LogTree subTree = logEntry.AppendMessage("Trying all supported compressions");
+            foreach (CompressionSettings compression in Preferences.ActiveCompressionAlgorithms)
             {
                 _ = gzContentStream.Seek(0, SeekOrigin.Begin);
-                var enc = CompressionHelper.TryDecompress(gzContentStream, compression);
+                Encoding? enc = CompressionHelper.TryDecompress(gzContentStream, compression);
                 if (enc != null)
                 { // was able to decompress
                     _ = subTree.AppendMessage($"Compression found: {compression.AlgorithmName}");
@@ -66,16 +62,13 @@ internal class FileHelper
 
     public static void BeforeSave(ScNotification notification)
     {
-        var path = NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom);
-        var scintillaGateway = Plugin.ScintillaGateway;
-        var compr = GetFileCompression(notification.Header.IdFrom);
+        StringBuilder path = NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom);
+        ScintillaGateway scintillaGateway = Plugin.ScintillaGateway;
+        CompressionSettings? compr = GetFileCompression(notification.Header.IdFrom);
 
         // store the current compression settings
-        if (compressionBeforeSave.ContainsKey(notification.Header.IdFrom))
+        if (!compressionBeforeSave.TryAdd(notification.Header.IdFrom, compr))
             compressionBeforeSave[notification.Header.IdFrom] = compr;
-        else
-            compressionBeforeSave.Add(notification.Header.IdFrom, compr);
-
         if (cursorPosition.ContainsKey(notification.Header.IdFrom))
             cursorPosition[notification.Header.IdFrom] = scintillaGateway.GetCurrentPos();
         else
@@ -86,17 +79,17 @@ internal class FileHelper
         scintillaGateway.BeginUndoAction();
 
 
-        using var contentStream = CompressionHelper.GetContentStream(notification, path);
-        var fileEncoding = FileTracker.GetEncoding(notification.Header.IdFrom) ?? new UTF8Encoding(false);
-        using var encodedContentStream = CompressionHelper.Encode(contentStream, fileEncoding,compr);
+        using MemoryStream contentStream = CompressionHelper.GetContentStream(notification, path);
+        Encoding fileEncoding = FileTracker.GetEncoding(notification.Header.IdFrom) ?? new UTF8Encoding(false);
+        using MemoryStream encodedContentStream = CompressionHelper.Encode(contentStream, fileEncoding,compr);
         CompressionHelper.SetEncodedText(encodedContentStream);
-        var currentNppEncoding = (NppEncoding)Plugin.NppGateway.GetBufferEncoding(notification.Header.IdFrom);
+        NppEncoding currentNppEncoding = (NppEncoding)Plugin.NppGateway.GetBufferEncoding(notification.Header.IdFrom);
         scintillaGateway.EndUndoAction();
     }
 
     private static CompressionSettings? GetFileCompression(IntPtr idFrom)
     {
-        var path = NppGateway.GetFullPathFromBufferId(idFrom);
+        StringBuilder path = NppGateway.GetFullPathFromBufferId(idFrom);
 
 
         if (FileTracker.IsExcluded(idFrom))
@@ -106,19 +99,18 @@ internal class FileHelper
             return null; // neither suffix nor included -> no compression, nothing to do
 
         // either suffix or included:
-        var compr = FileTracker.GetCompressor(idFrom);
-        if (compr == null)  // not included -> path
-            compr = Preferences.GetCompressionBySuffix(NppGateway.GetFullPathFromBufferId(idFrom));
+        CompressionSettings? compr = FileTracker.GetCompressor(idFrom);
+        compr ??= Preferences.GetCompressionBySuffix(NppGateway.GetFullPathFromBufferId(idFrom));
 
         return compr;
     }
 
     private static CompressionSettings? ShouldBeCompressed(ScNotification notification)
     {
-        var newPath = NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom).ToString();
+        string newPath = NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom).ToString();
 
         // no path change -> file tracked
-        var oldPath = FileTracker.GetStoredPath(notification.Header.IdFrom);
+        string? oldPath = FileTracker.GetStoredPath(notification.Header.IdFrom);
         if (newPath == oldPath)
         {
             if (FileTracker.IsIncluded(notification.Header.IdFrom)) // is tracked, so compress
@@ -157,10 +149,10 @@ internal class FileHelper
 
     public static void FileSaved(ScNotification notification)
     {
-        var scintillaGateway = Plugin.ScintillaGateway;
-        var path = NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom);
-        var targetCompression = ShouldBeCompressed(notification);
-        var oldCompressed = compressionBeforeSave.ContainsKey(notification.Header.IdFrom) ? compressionBeforeSave[notification.Header.IdFrom] : null;
+        ScintillaGateway scintillaGateway = Plugin.ScintillaGateway;
+        StringBuilder path = NppGateway.GetFullPathFromBufferId(notification.Header.IdFrom);
+        CompressionSettings? targetCompression = ShouldBeCompressed(notification);
+        CompressionSettings? oldCompressed = compressionBeforeSave.TryGetValue(notification.Header.IdFrom, out CompressionSettings? value) ? value : null;
 
         if (oldCompressed != targetCompression)
         {

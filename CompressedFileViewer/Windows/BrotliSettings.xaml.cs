@@ -1,17 +1,5 @@
 ﻿using CompressedFileViewer.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CompressedFileViewer.Windows;
 /// <summary>
@@ -19,10 +7,7 @@ namespace CompressedFileViewer.Windows;
 /// </summary>
 public partial class BrotliSettingsDialog : Window, ISettingsDialog
 {
-    static BrotliSettingsDialog()
-    {
-        SettingsDialog.RegistSettingsDialog(Settings.BrotliSettings.ALGORITHM_NAME, typeof(BrotliSettingsDialog));
-    }
+    static BrotliSettingsDialog() => SettingsDialog.RegistSettingsDialog(Settings.BrotliSettings.ALGORITHM_NAME, typeof(BrotliSettingsDialog));
 
     public BrotliSettingsDialog()
     {
@@ -30,9 +15,9 @@ public partial class BrotliSettingsDialog : Window, ISettingsDialog
         txtComprLevel.ItemsSource = Enum.GetValues<System.IO.Compression.CompressionLevel>();
     }
 
-    Settings.BrotliSettings? settings;
+    private Settings.BrotliSettings? settings;
 
-    public CompressionSettings? CompressionSettings 
+    public CompressionSettings? CompressionSettings
     {
         get => settings;
         set
@@ -40,7 +25,7 @@ public partial class BrotliSettingsDialog : Window, ISettingsDialog
             settings = (Settings.BrotliSettings?)value;
             txtComprLevel.SelectedItem = settings!.CompressionLevel;
             lstSuffix.Items.Clear();
-            foreach (var suffix in settings.Extensions)
+            foreach (string suffix in settings.Extensions)
                 _ = lstSuffix.Items.Add(suffix);
         }
     }
@@ -59,7 +44,7 @@ public partial class BrotliSettingsDialog : Window, ISettingsDialog
 
     private void DeleteSuffix(object sender, RoutedEventArgs e)
     {
-        if(lstSuffix.SelectedIndex != -1)
+        if (lstSuffix.SelectedIndex != -1)
             lstSuffix.Items.RemoveAt(lstSuffix.SelectedIndex);
     }
 
@@ -68,22 +53,22 @@ public partial class BrotliSettingsDialog : Window, ISettingsDialog
         settings!.Extensions.Clear();
         settings.Extensions.AddRange(lstSuffix.Items.Cast<string>());
         settings.CompressionLevel = (System.IO.Compression.CompressionLevel)txtComprLevel.SelectedItem;
-        this.DialogResult = true;
+        DialogResult = true;
         Close();
     }
 
     private void Cancel(object sender, RoutedEventArgs e)
     {
-        this.DialogResult = false;
+        DialogResult = false;
         Close();
     }
 
     private void Default(object sender, RoutedEventArgs e)
     {
-        var settings = Preferences.Default.BrotliSettings;
+        BrotliSettings settings = Preferences.Default.BrotliSettings;
         txtComprLevel.Text = settings.CompressionLevel.ToString();
         lstSuffix.Items.Clear();
-        foreach (var suffix in settings.Extensions)
+        foreach (string suffix in settings.Extensions)
             _ = lstSuffix.Items.Add(suffix);
 
     }

@@ -1,30 +1,19 @@
 ﻿using CompressedFileViewer.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CompressedFileViewer;
 public class FileTracker
 {
-    HashSet<IntPtr> compressedFiles = new HashSet<IntPtr>();
-    HashSet<IntPtr> excludedFiles = new HashSet<IntPtr> ();
+    private readonly HashSet<IntPtr> compressedFiles = [];
+    private readonly HashSet<IntPtr> excludedFiles = [];
+    private readonly Dictionary<IntPtr, string> filePathes = [];
+    private readonly Dictionary<IntPtr, Encoding> encodings = [];
+    private readonly Dictionary<IntPtr, CompressionSettings> compressions = [];
 
-    Dictionary<IntPtr, string> filePathes = new Dictionary<IntPtr, string>();
-    Dictionary<IntPtr, Encoding> encodings = new Dictionary<IntPtr, Encoding>();
-    Dictionary<IntPtr, CompressionSettings> compressions = new Dictionary<IntPtr, CompressionSettings>();
 
+    public void Include(IntPtr id, StringBuilder path, Encoding encoding, CompressionSettings compressor) => Include(id, path.ToString(), encoding, compressor);
 
-    public void Include(IntPtr id, StringBuilder path, Encoding encoding, CompressionSettings compressor)
-    {
-        Include(id, path.ToString(), encoding, compressor);
-    }
-
-    public void Exclude(IntPtr id, StringBuilder path)
-    {
-        Exclude(id, path.ToString());
-    }
+    public void Exclude(IntPtr id, StringBuilder path) => Exclude(id, path.ToString());
 
     public void Include(IntPtr id, string path, Encoding encoding, CompressionSettings compressor)
     {
@@ -52,9 +41,9 @@ public class FileTracker
         _ = encodings.Remove(id);
     }
 
-    public bool IsIncluded(IntPtr id) { return compressedFiles.Contains(id); }
+    public bool IsIncluded(IntPtr id) => compressedFiles.Contains(id);
 
-    public bool IsExcluded(IntPtr id) { return excludedFiles.Contains(id); }
+    public bool IsExcluded(IntPtr id) => excludedFiles.Contains(id);
 
     public string? GetStoredPath(IntPtr id) => filePathes.GetValueOrDefault(id);
 

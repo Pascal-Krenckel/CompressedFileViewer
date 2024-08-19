@@ -1,5 +1,4 @@
 ﻿// NPP plugin platform for .Net v0.94.00 by Kasper B. Graversen etc.
-using System;
 using System.Runtime.InteropServices;
 
 namespace CompressedFileViewer.PluginInfrastructure;
@@ -66,12 +65,7 @@ public class Position : IEquatable<Position>
 
     public static Position operator -(Position a, Position b) => new(a.Value - b.Value);
 
-    public static bool operator ==(Position a, Position b)
-    {
-        if (ReferenceEquals(a, b))
-            return true;
-        return a is not null && b is not null && a.Value == b.Value;
-    }
+    public static bool operator ==(Position a, Position b) => ReferenceEquals(a, b) || (a is not null && b is not null && a.Value == b.Value);
 
     public static bool operator !=(Position a, Position b) => !(a == b);
 
@@ -87,11 +81,7 @@ public class Position : IEquatable<Position>
 
     public bool Equals(Position? other) => other is not null && (ReferenceEquals(this, other) || Value == other.Value);
 
-    public override bool Equals(object? obj)
-    {
-        if (obj is null) return false;
-        return ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((Position)obj);
-    }
+    public override bool Equals(object? obj) => obj is not null && (ReferenceEquals(this, obj) || (obj.GetType() == GetType() && Equals((Position)obj)));
 
     public override int GetHashCode() => Value;
 }

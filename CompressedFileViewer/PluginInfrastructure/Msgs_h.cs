@@ -5,8 +5,6 @@
 // found at
 // https://github.com/notepad-plus-plus/notepad-plus-plus/blob/master/PowerEditor/src/MISC/PluginsManager/Notepad_plus_msgs.h
 
-using System;
-
 namespace CompressedFileViewer.PluginInfrastructure;
 internal class Constants
 {

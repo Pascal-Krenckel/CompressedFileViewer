@@ -1,23 +1,21 @@
-﻿using CompressedFileViewer.PluginInfrastructure;
-using CompressedFileViewer.Settings;
-using System;
-using System.Collections.Generic;
+﻿using CompressedFileViewer.Settings;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Xml.Serialization;
 
 namespace CompressedFileViewer;
 
+/// <summary>
+/// Initializes a new instance of the <see cref="Preferences"/> class with a specified decompress all setting.
+/// </summary>
+/// <param name="decompressAll">If set to <c>true</c>, all files will be decompressed.</param>
 [Serializable]
 /// <summary>
 /// Represents user preferences for compression settings. <br/>
 /// </summary>
-public class Preferences
+public class Preferences(bool decompressAll)
 {
-    public const int VERSION = 4;
+    public const int VERSION = 5;
 
     #region Properties
     /// <summary>
@@ -28,7 +26,7 @@ public class Preferences
     /// <summary>
     /// Gets or sets a value indicating whether all files should be attempted to be decompressed independent of the files extension.
     /// </summary>
-    public bool DecompressAll { get; set; }
+    public bool DecompressAll { get; set; } = decompressAll;
 
     /// <summary>
     /// True if the statusbar should show (AlgName)/(Encoding) instead of just the Npp default (Encoding)
@@ -66,15 +64,6 @@ public class Preferences
     /// </summary>
     public Preferences() : this(false) { }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Preferences"/> class with a specified decompress all setting.
-    /// </summary>
-    /// <param name="decompressAll">If set to <c>true</c>, all files will be decompressed.</param>
-    public Preferences(bool decompressAll)
-    {
-        DecompressAll = decompressAll;
-    }
-
     #endregion
 
     #region Serialization
@@ -95,8 +84,8 @@ public class Preferences
     /// <param name="to">The stream to serialize to.</param>
     public void Serialize(Stream to)
     {
-            XmlSerializer serializer = new XmlSerializer(typeof(Preferences));
-            serializer.Serialize(to, this);         
+        XmlSerializer serializer = new(typeof(Preferences));
+        serializer.Serialize(to, this);
     }
 
     /// <summary>
@@ -117,23 +106,23 @@ public class Preferences
     /// <returns>The deserialized preferences.</returns>
     public static Preferences Deserialize(Stream from)
     {
-        XmlSerializer serializer = new XmlSerializer(typeof(Preferences));
-        var pref = (Preferences)serializer.Deserialize(from)!;
+        XmlSerializer serializer = new(typeof(Preferences));
+        Preferences pref = (Preferences)serializer.Deserialize(from)!;
         pref.Version = Preferences.VERSION;
-        if(pref.Version < 1)
+        if (pref.Version < 1)
         {
             pref.BZip2Settings = Default.BZip2Settings;
             pref.GZipSettings = Default.GZipSettings;
         }
-        if(pref.Version < 2)
+        if (pref.Version < 2)
         {
             pref.ZstdSettings = Default.ZstdSettings;
         }
-        if(pref.Version < 3)
+        if (pref.Version < 3)
         {
             pref.XZSettings = Default.XZSettings;
         }
-        if(pref.Version < 4)
+        if (pref.Version < 4)
         {
             pref.BrotliSettings = Default.BrotliSettings;
         }
@@ -157,10 +146,7 @@ public class Preferences
     /// </summary>
     /// <param name="path">The file path to get the compression settings for.</param>
     /// <returns>The compression settings for the file.</returns>
-    public CompressionSettings? GetCompressionBySuffix(string? path)
-    {
-        return EnabledCompressionAlgorithms.FirstOrDefault(comp => comp.Extensions.Any(ext => path?.EndsWith(ext, StringComparison.OrdinalIgnoreCase) ?? false));
-    }
+    public CompressionSettings? GetCompressionBySuffix(string? path) => EnabledCompressionAlgorithms.FirstOrDefault(comp => comp.Extensions.Any(ext => path?.EndsWith(ext, StringComparison.OrdinalIgnoreCase) ?? false));
 
     /// <summary>
     /// Gets the compression settings for a file based by extension.
@@ -189,12 +175,9 @@ public class Preferences
     /// <param name="compressionAlgorithm">The name of the current compression algorithm of the file.</param>
     /// <param name="compressionBySuffix">The compression settings based on the files extension.</param>
     /// <returns>The next compression algorithm</returns>
-    public CompressionSettings? GetNextCompressor(string? compressionAlgorithm, CompressionSettings? compressionBySuffix)
-    {
-        if (string.IsNullOrWhiteSpace(compressionAlgorithm))
-            return compressionBySuffix ?? ActiveCompressionAlgorithms.FirstOrDefault();
-        else
-            return (compressionAlgorithm != compressionBySuffix?.AlgorithmName ?
+    public CompressionSettings? GetNextCompressor(string? compressionAlgorithm, CompressionSettings? compressionBySuffix) => string.IsNullOrWhiteSpace(compressionAlgorithm)
+            ? compressionBySuffix ?? ActiveCompressionAlgorithms.FirstOrDefault()
+            : (compressionAlgorithm != compressionBySuffix?.AlgorithmName ?
 
                 ActiveCompressionAlgorithms
                 .SkipWhile(alg => alg.AlgorithmName != compressionAlgorithm)
@@ -203,7 +186,6 @@ public class Preferences
                 ActiveCompressionAlgorithms
                 )
                 .FirstOrDefault(alg => alg != compressionBySuffix);
-    }
 
     /// <summary>
     /// Gets the default preferences.
