@@ -1,12 +1,8 @@
 ﻿using CompressedFileViewer.PluginInfrastructure;
 using CompressedFileViewer.Settings;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace CompressedFileViewer;
@@ -15,7 +11,7 @@ public class Plugin
     public static readonly string PluginName = "CompressedFileViewer";
     public static NotepadPPGateway NppGateway { get; } = new();
     public static ScintillaGateway ScintillaGateway => PluginBase.GetCurrentScintilla();
-    public static FileTracker FileTracker = new();
+    public static FileTracker FileTracker { get; } = new();
     public static Preferences Preferences { get; set; } = new();
 
     internal static void OnNotification(ScNotification notification)
@@ -64,7 +60,7 @@ public class Plugin
 
     private static void AddCommands()
     {
-        using var iconStream = System.Reflection.Assembly.GetCallingAssembly().GetManifestResourceStream(typeof(Plugin).Namespace!+".icons.gzip-filled16.png")!;
+        using Stream iconStream = System.Reflection.Assembly.GetCallingAssembly().GetManifestResourceStream(typeof(Plugin).Namespace!+".icons.gzip-filled16.png")!;
         Bitmap icon = (Bitmap)Bitmap.FromStream(iconStream);
 
         PluginBase.AddCommand("Toogle Compression", ToogleCompress, icon);
@@ -79,11 +75,11 @@ public class Plugin
         PluginBase.AddCommand("Credits", () => new Windows.Credits().ShowDialog());
         PluginBase.AddMenuSeperator();
 
-        foreach (var compr in Preferences.EnabledCompressionAlgorithms)
+        foreach (CompressionSettings compr in Preferences.EnabledCompressionAlgorithms)
             PluginBase.AddCommand(compr.AlgorithmName, () =>
             {
                 IntPtr bufferId = NppGateway.GetCurrentBufferId();
-                var compressor = Preferences.EnabledCompressionAlgorithms.FirstOrDefault(alg => alg.AlgorithmName == compr.AlgorithmName);
+                CompressionSettings? compressor = Preferences.EnabledCompressionAlgorithms.FirstOrDefault(alg => alg.AlgorithmName == compr.AlgorithmName);
 
                 compressor = FileTracker.GetCompressor(bufferId) == compressor ? null : compressor; // if already compressed (same compressor) disable compression
 
@@ -100,7 +96,7 @@ public class Plugin
     private static void ToogleCompress()
     {
         IntPtr bufferId = NppGateway.GetCurrentBufferId();
-        var compressor = Preferences.GetNextCompressor(FileTracker.GetCompressor(bufferId)?.AlgorithmName, Preferences.GetCompressionBySuffix(NppGateway.GetFullPathFromBufferId(bufferId)));
+        CompressionSettings? compressor = Preferences.GetNextCompressor(FileTracker.GetCompressor(bufferId)?.AlgorithmName, Preferences.GetCompressionBySuffix(NppGateway.GetFullPathFromBufferId(bufferId)));
 
         CompressionHelper.SetCompression(FileTracker, bufferId, compressor);
 
@@ -116,7 +112,7 @@ public class Plugin
         {
             if (FileTracker.IsIncluded(from))
             {
-                var enc = FileTracker.GetEncoding(from);
+                Encoding? enc = FileTracker.GetEncoding(from);
                 string str = $"{FileTracker?.GetCompressor(from)?.AlgorithmName}/{enc?.WebName?.ToUpper()}";
                 if (enc?.GetPreamble().Length > 0)
                     str += " BOM";
@@ -124,7 +120,7 @@ public class Plugin
             }
             else if (resetStatusbar)
             {
-                var enc = CompressionHelper.ToEncoding((NppEncoding)NppGateway.GetBufferEncoding(from));
+                Encoding enc = CompressionHelper.ToEncoding((NppEncoding)NppGateway.GetBufferEncoding(from));
                 string str = $"{enc.WebName.ToUpper()}";
                 if (enc.GetPreamble().Length > 0)
                     str += " BOM";
@@ -135,8 +131,8 @@ public class Plugin
     private static void UpdateCommandChecked(IntPtr from)
     {
         NppGateway.SetMenuItemCheck(0, FileTracker.IsIncluded(from));
-        var compr = FileTracker.GetCompressor(from);
-        foreach (var posCompr in Preferences.EnabledCompressionAlgorithms)
+        CompressionSettings? compr = FileTracker.GetCompressor(from);
+        foreach (CompressionSettings posCompr in Preferences.EnabledCompressionAlgorithms)
             NppGateway.SetMenuItemCheck(posCompr.AlgorithmName, compr?.AlgorithmName == posCompr.AlgorithmName);
     }
 
@@ -149,10 +145,10 @@ public class Plugin
         if (compressForm.ShowDialog() == true && compressForm.SelectedCompression != null)
         {
             IntPtr bufferId = NppGateway.GetCurrentBufferId();
-            var compr = compressForm.SelectedCompression;
-            using var contentStream = CompressionHelper.GetCurrentContentStream();
-            var enc = FileTracker.GetEncoding(bufferId) ?? CompressionHelper.ToEncoding((NppEncoding)NppGateway.GetBufferEncoding(bufferId));
-            using var encodedContentStream = CompressionHelper.Encode(contentStream, enc, compr);
+            CompressionSettings compr = compressForm.SelectedCompression;
+            using MemoryStream contentStream = CompressionHelper.GetCurrentContentStream();
+            Encoding enc = FileTracker.GetEncoding(bufferId) ?? CompressionHelper.ToEncoding((NppEncoding)NppGateway.GetBufferEncoding(bufferId));
+            using MemoryStream encodedContentStream = CompressionHelper.Encode(contentStream, enc, compr);
             CompressionHelper.SetEncodedText(encodedContentStream);
             NppGateway.SendMenuEncoding(NppEncoding.UTF8); // Set MenuEncoding to match scintillas internal buffer encoding
                                                            // if it's not UTF-8... who cares
@@ -167,12 +163,12 @@ public class Plugin
         };
         if (decompressForm.ShowDialog() == true && decompressForm.SelectedCompression != null)
         {
-            IntPtr bufferId = NppGateway.GetCurrentBufferId();
-            var compr = decompressForm.SelectedCompression;
-            using var contentStream = CompressionHelper.GetCurrentContentStream();
-            using var decodedContentStream = CompressionHelper.Decode(contentStream, compr);
-            var enc = CompressionHelper.SetDecodedText(decodedContentStream);
-            var nppEnc = CompressionHelper.ToNppEncoding(enc);
+            _ = NppGateway.GetCurrentBufferId();
+            CompressionSettings compr = decompressForm.SelectedCompression;
+            using MemoryStream contentStream = CompressionHelper.GetCurrentContentStream();
+            using MemoryStream decodedContentStream = CompressionHelper.Decode(contentStream, compr);
+            Encoding enc = CompressionHelper.SetDecodedText(decodedContentStream);
+            NppEncoding nppEnc = CompressionHelper.ToNppEncoding(enc);
             NppGateway.SendMenuEncoding(nppEnc);
         }
     }
@@ -180,7 +176,7 @@ public class Plugin
     #region Settings
     private static void ShowSettings()
     {
-        var window = new Windows.SettingsDialog() { Preferences = Preferences };
+        Windows.SettingsDialog window = new() { Preferences = Preferences };
         if (window.ShowDialog() == true)
         {
             Preferences = window.Preferences;
@@ -194,14 +190,14 @@ public class Plugin
         initFilePath = Path.Combine(initFilePath, PluginName + ".config");
         try
         {
-            Preferences = Preferences.Deserialize(initFilePath); Logging.Log("Finished loading settings");            
+            Preferences = Preferences.Deserialize(initFilePath); Logging.Log("Finished loading settings");
         }
         catch (Exception ex)
         {
             Logging.Log(ex);
-            Preferences = Preferences.Default;            
+            Preferences = Preferences.Default;
         }
-        foreach (var alg in Preferences.EnabledCompressionAlgorithms) alg.Initialize();
+        foreach (CompressionSettings alg in Preferences.EnabledCompressionAlgorithms) alg.Initialize();
     }
     private static void SaveSettings()
     {

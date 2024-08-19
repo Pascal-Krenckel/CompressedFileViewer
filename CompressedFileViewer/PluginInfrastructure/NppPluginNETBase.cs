@@ -1,11 +1,10 @@
 ﻿// NPP plugin platform for .Net v0.94.00 by Kasper B. Graversen etc.
-using System;
 using System.Drawing;
 
 namespace CompressedFileViewer.PluginInfrastructure;
 internal class PluginBase
 {
-    internal static Dictionary<int,(Bitmap bmp, Bitmap? bmpDarkMode)> tbIcons = new();
+    internal static Dictionary<int,(Bitmap bmp, Bitmap? bmpDarkMode)> tbIcons = [];
 
     internal static NppData nppData;
     internal static FuncItems _funcItems = new();
@@ -211,7 +210,7 @@ internal class PluginBase
 
     public static void SetToolbar()
     {
-        foreach (var tbIcon in tbIcons)
+        foreach (KeyValuePair<int, (Bitmap bmp, Bitmap? bmpDarkMode)> tbIcon in tbIcons)
         {
             if (tbIcon.Value.bmpDarkMode == null)
                 Plugin.NppGateway.SetToolbarIcon(_funcItems.Items[tbIcon.Key]._cmdID, tbIcon.Value.bmp);
@@ -231,7 +230,7 @@ internal class PluginBase
     internal static void CleanUp()
     {
         _funcItems.Dispose();
-        foreach (var tbIcon in tbIcons)
+        foreach (KeyValuePair<int, (Bitmap bmp, Bitmap? bmpDarkMode)> tbIcon in tbIcons)
         {
             tbIcon.Value.bmp.Dispose();
             tbIcon.Value.bmpDarkMode?.Dispose();

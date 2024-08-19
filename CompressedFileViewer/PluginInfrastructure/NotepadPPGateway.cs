@@ -1,7 +1,5 @@
 ﻿// NPP plugin platform for .Net v0.94.00 by Kasper B. Graversen etc.
-using System;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -104,12 +102,12 @@ public class NotepadPPGateway : INotepadPPGateway
     /// <param name="iconDarkMode"></param>
     internal void SetToolbarIcon(int cmdId, Bitmap icon, Bitmap iconDarkMode)
     {
-        ToolbarIcons toolbar = new();
-#pragma warning disable CA1416 // Plattformkompatibilität überprüfen
-        toolbar.hToolbarBmp = icon.GetHbitmap();
-        toolbar.hToolbarIcon = icon.GetHicon();
-        toolbar.hToolbarIconDarkMode = iconDarkMode.GetHicon();
-#pragma warning restore CA1416 // Plattformkompatibilität überprüfen
+        ToolbarIcons toolbar = new()
+        {
+            hToolbarBmp = icon.GetHbitmap(),
+            hToolbarIcon = icon.GetHicon(),
+            hToolbarIconDarkMode = iconDarkMode.GetHicon()
+        };
         IntPtr pTbIcons = Marshal.AllocHGlobal(Marshal.SizeOf(toolbar));
         Marshal.StructureToPtr(toolbar, pTbIcons, false);
         _ = Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_ADDTOOLBARICON_FORDARKMODE, cmdId, pTbIcons);
@@ -124,11 +122,11 @@ public class NotepadPPGateway : INotepadPPGateway
     /// <param name="iconDarkMode"></param>
     internal void SetToolbarIcon(int cmdId, Bitmap icon)
     {
-        ToolbarIcons toolbar = new();
-#pragma warning disable CA1416 // Plattformkompatibilität überprüfen
-        toolbar.hToolbarBmp = icon.GetHbitmap();
+        ToolbarIcons toolbar = new()
+        {
+            hToolbarBmp = icon.GetHbitmap()
+        };
         toolbar.hToolbarIconDarkMode = toolbar.hToolbarIcon = icon.GetHicon();
-#pragma warning restore CA1416 // Plattformkompatibilität überprüfen
         IntPtr pTbIcons = Marshal.AllocHGlobal(Marshal.SizeOf(toolbar));
         Marshal.StructureToPtr(toolbar, pTbIcons, false);
         _ = Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_ADDTOOLBARICON_FORDARKMODE, cmdId, pTbIcons);
@@ -143,7 +141,7 @@ public class NotepadPPGateway : INotepadPPGateway
     {
         int length = (int)Win32.SendMessage(NppHandle, NppMsg.NPPM_GETPLUGINSCONFIGDIR, 0, 0);
         StringBuilder sb = new(length+1);
-        _ = Win32.SendMessage(NppHandle, NppMsg.NPPM_GETPLUGINSCONFIGDIR, length+1, sb);
+        _ = Win32.SendMessage(NppHandle, NppMsg.NPPM_GETPLUGINSCONFIGDIR, length + 1, sb);
         return sb.ToString();
     }
 }

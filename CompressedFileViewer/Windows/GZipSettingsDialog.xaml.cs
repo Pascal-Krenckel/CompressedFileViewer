@@ -1,17 +1,5 @@
 ﻿using CompressedFileViewer.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CompressedFileViewer.Windows;
 /// <summary>
@@ -19,19 +7,13 @@ namespace CompressedFileViewer.Windows;
 /// </summary>
 public partial class GZipSettingsDialog : Window, ISettingsDialog
 {
-    static GZipSettingsDialog()
-    {
-        SettingsDialog.RegistSettingsDialog(GZipSettings.ALGORITHM_NAME, typeof(GZipSettingsDialog));
-    }
+    static GZipSettingsDialog() => SettingsDialog.RegistSettingsDialog(GZipSettings.ALGORITHM_NAME, typeof(GZipSettingsDialog));
 
-    public GZipSettingsDialog()
-    {
-        InitializeComponent();
-    }
+    public GZipSettingsDialog() => InitializeComponent();
 
-    Settings.GZipSettings? settings;
+    private Settings.GZipSettings? settings;
 
-    public CompressionSettings? CompressionSettings 
+    public CompressionSettings? CompressionSettings
     {
         get => settings;
         set
@@ -40,7 +22,7 @@ public partial class GZipSettingsDialog : Window, ISettingsDialog
             txtBufferSize.Text = settings!.BufferSize.ToString();
             txtComprLevel.Text = settings.CompressionLevel.ToString();
             lstSuffix.Items.Clear();
-            foreach (var suffix in settings.Extensions)
+            foreach (string suffix in settings.Extensions)
                 _ = lstSuffix.Items.Add(suffix);
         }
     }
@@ -59,7 +41,7 @@ public partial class GZipSettingsDialog : Window, ISettingsDialog
 
     private void DeleteSuffix(object sender, RoutedEventArgs e)
     {
-        if(lstSuffix.SelectedIndex != -1)
+        if (lstSuffix.SelectedIndex != -1)
             lstSuffix.Items.RemoveAt(lstSuffix.SelectedIndex);
     }
 
@@ -71,23 +53,23 @@ public partial class GZipSettingsDialog : Window, ISettingsDialog
         settings.Extensions.AddRange(lstSuffix.Items.Cast<string>());
         settings.CompressionLevel = comprLevel;
         settings.BufferSize = bufferSize;
-        this.DialogResult = true;
+        DialogResult = true;
         Close();
     }
 
     private void Cancel(object sender, RoutedEventArgs e)
     {
-        this.DialogResult = false;
+        DialogResult = false;
         Close();
     }
 
     private void Default(object sender, RoutedEventArgs e)
     {
-        var settings = Preferences.Default.GZipSettings;
+        GZipSettings settings = Preferences.Default.GZipSettings;
         txtBufferSize.Text = settings!.BufferSize.ToString();
         txtComprLevel.Text = settings.CompressionLevel.ToString();
         lstSuffix.Items.Clear();
-        foreach (var suffix in settings.Extensions)
+        foreach (string suffix in settings.Extensions)
             _ = lstSuffix.Items.Add(suffix);
 
     }

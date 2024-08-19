@@ -1,7 +1,4 @@
-﻿using CompressedFileViewer;
-using CompressedFileViewer.PluginInfrastructure;
-using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 

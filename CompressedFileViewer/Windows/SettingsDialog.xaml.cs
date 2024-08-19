@@ -1,23 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 using System.Xml.Serialization;
-using Preferences = CompressedFileViewer.Preferences;
 
 namespace CompressedFileViewer.Windows;
 /// <summary>
@@ -25,7 +12,7 @@ namespace CompressedFileViewer.Windows;
 /// </summary>
 public partial class SettingsDialog : Window
 {
-    static Dictionary<string,Type> typeDict = [];
+    private static readonly Dictionary<string,Type> typeDict = [];
     public static void RegistSettingsDialog(string algName, Type windowType)
     {
         if (!windowType.IsSubclassOf(typeof(Window)))
@@ -37,7 +24,7 @@ public partial class SettingsDialog : Window
 
     static SettingsDialog()
     {
-        foreach (var t in Assembly.GetCallingAssembly().GetTypes().Where(t => t.GetInterface(nameof(ISettingsDialog)) != null))
+        foreach (Type? t in Assembly.GetCallingAssembly().GetTypes().Where(t => t.GetInterface(nameof(ISettingsDialog)) != null))
             try
             {
                 System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(t.TypeHandle);
@@ -48,12 +35,9 @@ public partial class SettingsDialog : Window
             }
     }
 
-    public SettingsDialog()
-    {
-        InitializeComponent();
-    }
+    public SettingsDialog() => InitializeComponent();
 
-    Preferences preferences = new();
+    private Preferences preferences = new();
 
     public Preferences Preferences
     {
@@ -61,18 +45,18 @@ public partial class SettingsDialog : Window
         {
             preferences.DecompressAll = chk_decompressAll.IsChecked == true;
             preferences.UpdateStatusBar = chk_updateStatusBar.IsChecked == true;
-            
-            for(int i = 0; i < lstAlg.Items.Count; i++)
+
+            for (int i = 0; i < lstAlg.Items.Count; i++)
             {
                 AlgEntry compr = (AlgEntry)lstAlg.Items[i];
-                var settings = preferences.GetCompressionByName(compr.Name)!;
+                Settings.CompressionSettings settings = preferences.GetCompressionByName(compr.Name)!;
                 settings.IsActive = compr.IsActive;
                 if (!settings.IsEnabled && compr.IsEnabled)
                     settings.Initialize();
                 settings.IsEnabled = compr.IsEnabled;
                 settings.SortOrder = i;
             }
-           
+
             return preferences;
         }
         set
@@ -81,14 +65,14 @@ public partial class SettingsDialog : Window
             chk_decompressAll.IsChecked = preferences.DecompressAll;
             chk_updateStatusBar.IsChecked = preferences.UpdateStatusBar;
             lstAlg.Items.Clear();
-            foreach (var alg in preferences.CompressionAlgorithms)
+            foreach (Settings.CompressionSettings alg in preferences.CompressionAlgorithms)
                 _ = lstAlg.Items.Add(new AlgEntry(alg.AlgorithmName, alg.IsEnabled, alg.IsSupported, alg.IsActive));
         }
     }
 
     private static Preferences Clone(Preferences preferences)
     {
-        XmlSerializer xmlSerializer = new XmlSerializer(typeof(Preferences));
+        XmlSerializer xmlSerializer = new(typeof(Preferences));
         using MemoryStream memoryStream = new();
         xmlSerializer.Serialize(memoryStream, preferences);
         _ = memoryStream.Seek(0, SeekOrigin.Begin);
@@ -150,14 +134,11 @@ public partial class SettingsDialog : Window
 
     private void OK(object sender, RoutedEventArgs e)
     {
-        this.DialogResult = true;
+        DialogResult = true;
         Close();
     }
 
-    private void Default(object sender, RoutedEventArgs e)
-    {
-        Preferences = Preferences.Default;
-    }
+    private void Default(object sender, RoutedEventArgs e) => Preferences = Preferences.Default;
 
     private void Cancel(object sender, RoutedEventArgs e)
     {
@@ -167,23 +148,15 @@ public partial class SettingsDialog : Window
 }
 
 
-public class AlgEntry : INotifyPropertyChanged, IEquatable<AlgEntry?>
+public class AlgEntry(string name, bool isEnabled, bool isSupported, bool isActive) : INotifyPropertyChanged, IEquatable<AlgEntry?>
 {
-    private string name;
-    private bool isEnabled;
-    private bool isSupported;
-    private bool isActive;
+    private string name = name;
+    private bool isEnabled = isEnabled;
+    private bool isSupported = isSupported;
+    private bool isActive = isActive;
 
-    public AlgEntry(string name, bool isEnabled, bool isSupported, bool isActive)
-    {
-        this.name = name;
-        this.isEnabled = isEnabled;
-        this.isSupported = isSupported;
-        this.isActive = isActive;
-    }
-
-    public string Name { get => name; set => SetValue(ref name,value); }
-    public bool IsEnabled { get => isEnabled; set => SetValue(ref isEnabled,value); }
+    public string Name { get => name; set => SetValue(ref name, value); }
+    public bool IsEnabled { get => isEnabled; set => SetValue(ref isEnabled, value); }
     public bool IsSupported { get => isSupported; set => SetValue(ref isSupported, value); }
     public bool IsActive { get => isActive; set => SetValue(ref isActive, value); }
 
@@ -192,9 +165,9 @@ public class AlgEntry : INotifyPropertyChanged, IEquatable<AlgEntry?>
     public override bool Equals(object? obj) => Equals(obj as AlgEntry);
     public bool Equals(AlgEntry? other) => other is not null && name == other.name;
     public override int GetHashCode() => HashCode.Combine(name);
-    private void RaisePropertyChanged([CallerMemberName]string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    private void RaisePropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    private void SetValue<T>(ref T property,T value, [CallerMemberName]string? propertyName = null)
+    private void SetValue<T>(ref T property, T value, [CallerMemberName] string? propertyName = null)
     {
         property = value;
         RaisePropertyChanged(propertyName);

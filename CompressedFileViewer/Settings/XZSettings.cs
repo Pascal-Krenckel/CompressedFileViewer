@@ -1,18 +1,12 @@
 ﻿using Joveler.Compression.XZ;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CompressedFileViewer.Settings;
 [Serializable]
 public class XZSettings : CompressionSettings
 {
     public static readonly string ALGORITHM_NAME = "xz";
-    static bool isSupported = true;
+    private static bool isSupported = true;
 
     public override string AlgorithmName => ALGORITHM_NAME;
 
@@ -24,7 +18,7 @@ public class XZSettings : CompressionSettings
 
     public LzmaCompLevel CompressionLevel { get; set; } = LzmaCompLevel.Default;
 
-    private XZCompressOptions CompressionOptions => new XZCompressOptions()
+    private XZCompressOptions CompressionOptions => new()
     {
         BufferSize = BufferSize,
         Check = ChecksumType,
@@ -33,7 +27,7 @@ public class XZSettings : CompressionSettings
         Level = CompressionLevel,
 
     };
-    private XZDecompressOptions DecompressOptions => new XZDecompressOptions()
+    private XZDecompressOptions DecompressOptions => new()
     {
         BufferSize = BufferSize,
         LeaveOpen = true,
@@ -42,24 +36,15 @@ public class XZSettings : CompressionSettings
     public bool MultiThreading { get; set; } = false;
     public int Threads { get; set; } = Environment.ProcessorCount;
 
-    private XZThreadedCompressOptions ThreadOptions => new XZThreadedCompressOptions() { BlockSize = (uint)BufferSize, Threads = Threads };
-    private XZThreadedDecompressOptions ThreadDecompressOptions => new XZThreadedDecompressOptions() { Threads = Threads };
+    private XZThreadedCompressOptions ThreadOptions => new() { BlockSize = (uint)BufferSize, Threads = Threads };
+    private XZThreadedDecompressOptions ThreadDecompressOptions => new() { Threads = Threads };
 
     public override bool IsSupported => isSupported;
 
-    public override Stream GetCompressionStream(Stream outStream)
-    {
-        if (!MultiThreading)
-            return new XZStream(outStream, CompressionOptions);
-        else
-            return new XZStream(outStream, CompressionOptions, ThreadOptions);
-    }
-    public override Stream GetDecompressionStream(Stream inStream)
-    {
-        if (!MultiThreading)
-            return new XZStream(inStream, DecompressOptions);
-        return new XZStream(inStream, DecompressOptions, ThreadDecompressOptions);
-    }
+    public override Stream GetCompressionStream(Stream outStream) => !MultiThreading ? new XZStream(outStream, CompressionOptions) : (Stream)new XZStream(outStream, CompressionOptions, ThreadOptions);
+    public override Stream GetDecompressionStream(Stream inStream) => !MultiThreading
+            ? new XZStream(inStream, DecompressOptions)
+            : (Stream)new XZStream(inStream, DecompressOptions, ThreadDecompressOptions);
 
     public override void Initialize()
     {

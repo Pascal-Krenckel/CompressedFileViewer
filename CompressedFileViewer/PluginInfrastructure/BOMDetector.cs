@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CompressedFileViewer.PluginInfrastructure;
+﻿namespace CompressedFileViewer.PluginInfrastructure;
 internal class BOMDetector
 {
     /// <summary>
@@ -13,7 +7,7 @@ internal class BOMDetector
     /// <param name="bom">The array to analyze.</param>
     /// <returns>The detected encoding.</returns>
     public static BOM GetEncoding(byte[] bom) => GetEncoding(bom.AsSpan());
-  
+
     // Source: https://stackoverflow.com/questions/3825390/effective-way-to-find-any-files-encoding
     /// <summary>
     /// Determines an arrays encoding by analyzing its byte order mark (BOM).    

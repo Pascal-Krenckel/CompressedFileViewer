@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CompressedFileViewer.Windows;
 /// <summary>
@@ -32,19 +19,19 @@ public partial class Log : Window
 
     }
 
-    public static ObservableCollection<LogEntry> LogEntries { get; set; } = new();
+    public static ObservableCollection<LogEntry> LogEntries { get; set; } = [];
 
 }
 public class LogEntry : PropertyChangedBase
 {
     public DateTime DateTime { get; set; }
 
-    public string Message { get; set; } = String.Empty;
+    public string Message { get; set; } = string.Empty;
 }
 
 public class CollapsibleLogEntry : LogEntry
 {
-    public List<LogEntry> Contents { get; set; } = new();
+    public List<LogEntry> Contents { get; set; } = [];
 }
 
 public class PropertyChangedBase : INotifyPropertyChanged
@@ -54,9 +41,9 @@ public class PropertyChangedBase : INotifyPropertyChanged
     protected virtual void OnPropertyChanged(string propertyName)
     {
         if (PropertyChanged != null)
-            _ = Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+            _ = Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }));
+            });
     }
 }

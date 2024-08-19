@@ -1,7 +1,6 @@
 ﻿// NPP plugin platform for .Net v0.94.00 by Kasper B. Graversen etc.
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Unicode;
 using static CompressedFileViewer.PluginInfrastructure.Win32;
 
 namespace CompressedFileViewer.PluginInfrastructure;
@@ -70,7 +69,7 @@ public class ScintillaGateway : IScintillaGateway
     /// <returns>A ScrollInfo struct with information of the current scroll state</returns>
     public ScrollInfo GetScrollInfo(ScrollInfoMask mask = ScrollInfoMask.SIF_ALL, ScrollInfoBar scrollBar = ScrollInfoBar.SB_BOTH)
     {
-        ScrollInfo scrollInfo = new ScrollInfo();
+        ScrollInfo scrollInfo = new();
         scrollInfo.cbSize = (uint)Marshal.SizeOf(scrollInfo);
         scrollInfo.fMask = (uint)mask;
         _ = Win32.GetScrollInfo(scintilla, (int)scrollBar, ref scrollInfo);
@@ -90,7 +89,7 @@ public class ScintillaGateway : IScintillaGateway
     /// <summary>Add text to the document at current position. (Scintilla feature 2001)</summary>
     public unsafe void AddText(string text)
     {
-        var bytes = Encoding.UTF8.GetBytes(text);
+        byte[] bytes = Encoding.UTF8.GetBytes(text);
         fixed (byte* textPtr = bytes)
         {
             nint res = Win32.SendMessage(scintilla, SciMsg.SCI_ADDTEXT, bytes.Length, (nint)textPtr);
@@ -143,10 +142,7 @@ public class ScintillaGateway : IScintillaGateway
     public void ClearDocumentStyle() => _ = Win32.SendMessage(scintilla, SciMsg.SCI_CLEARDOCUMENTSTYLE, Unused, Unused);
 
     /// <summary>Returns the number of bytes in the document. (Scintilla feature 2006)</summary>
-    public int GetLength()
-    {
-        return (int)Win32.SendMessage(scintilla, SciMsg.SCI_GETLENGTH, Unused, Unused);
-    }
+    public int GetLength() => (int)Win32.SendMessage(scintilla, SciMsg.SCI_GETLENGTH, Unused, Unused);
 
     /// <summary>Returns the character byte at the position. (Scintilla feature 2007)</summary>
     public int GetCharAt(Position pos)

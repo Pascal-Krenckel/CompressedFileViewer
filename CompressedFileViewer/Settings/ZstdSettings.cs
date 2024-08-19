@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace CompressedFileViewer.Settings;
 [Serializable]
 public class ZstdSettings : CompressionSettings
 {
     public static readonly string ALGORITHM_NAME = "zstd";
-
-    static bool isSupported = true;
+    private static bool isSupported = true;
 
     public int CompressionLevel { get; set; } = 11;
     public int BufferSize { get; set; } = 1024 * 1024;
@@ -36,8 +30,8 @@ public class ZstdSettings : CompressionSettings
         isSupported = true;
         try
         {
-            using var compressor = new ZstdSharp.Compressor();
-            using var decompressor = new ZstdSharp.Decompressor();
+            using ZstdSharp.Compressor compressor = new();
+            using ZstdSharp.Decompressor decompressor = new();
         }
         catch (Exception ex)
         {
