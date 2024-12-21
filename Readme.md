@@ -17,7 +17,7 @@ Don't change the encoding (`UTF-8`, `ANSI`, etc.) of a compressed file. Change t
 ### Dll-Files
 Download the zip file depending on your architecture. 
 Unpack the zip file and copy all files into `%NotepadDir%/plugins/CompressedFileViewer`.
-Make sure .Net 8 is installed.
+Make sure [.Net 8 - Desktop](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is installed.
 Go to settings to enable the different algorithms, since all are disabled by default.
 
 ### Terminus:
