@@ -19,7 +19,7 @@
 		<PackageProjectUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>		
-		<AssemblyVersion>5.0.1.0</AssemblyVersion>
+		<AssemblyVersion>5.0.2.0</AssemblyVersion>
 		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageIcon>gzip-filled.png</PackageIcon>
@@ -43,11 +43,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DNNE" Version="2.0.7" />
+		<PackageReference Include="DNNE" Version="2.1.2" />
 		<PackageReference Include="Joveler.Compression.XZ" Version="5.0.2" />
 		<PackageReference Include="SharpZipLib" Version="1.4.2" />
-		<PackageReference Include="System.Drawing.Common" Version="9.0.10" />
-		<PackageReference Include="ZstdSharp.Port" Version="0.8.6" />
+		<PackageReference Include="System.Drawing.Common" Version="10.0.8" />
+		<PackageReference Include="ZstdSharp.Port" Version="0.8.8" />
 	</ItemGroup>
 
 	<ItemGroup>
