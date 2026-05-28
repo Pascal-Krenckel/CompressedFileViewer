@@ -55,11 +55,9 @@ public class Colour
 /// If you use messages, there is nothing to stop you setting a position that is in the middle of a CRLF pair, or in the middle of a 2 byte character.
 /// However, keyboard commands will not move the caret into such positions.
 /// </summary>
-public class Position : IEquatable<Position>
+public class Position(int pos) : IEquatable<Position>
 {
-    public Position(int pos) => Value = pos;
-
-    public int Value { get; }
+    public int Value { get; } = pos;
 
     public static Position operator +(Position a, Position b) => new(a.Value + b.Value);
 
@@ -97,37 +95,32 @@ public class Position : IEquatable<Position>
 /// On OS X, the Command key is mapped to SCMOD_CTRL and the Control key to SCMOD_META.SCMOD_SUPER is only available on GTK+ which is commonly the Windows key.
 /// If you are building a table, you might want to use SCMOD_NORM, which has the value 0, to mean no modifiers.
 /// </summary>
-public class KeyModifier
+/// <remarks>
+/// The key code is a visible or control character or a key from the SCK_* enumeration, which contains:
+/// SCK_ADD, SCK_BACK, SCK_DELETE, SCK_DIVIDE, SCK_DOWN, SCK_END, SCK_ESCAPE, SCK_HOME, SCK_INSERT, SCK_LEFT, SCK_MENU, SCK_NEXT(Page Down), SCK_PRIOR(Page Up),
+/// SCK_RETURN, SCK_RIGHT, SCK_RWIN, SCK_SUBTRACT, SCK_TAB, SCK_UP, and SCK_WIN.
+///
+/// The modifiers are a combination of zero or more of SCMOD_ALT, SCMOD_CTRL, SCMOD_SHIFT, SCMOD_META, and SCMOD_SUPER.
+/// On OS X, the Command key is mapped to SCMOD_CTRL and the Control key to SCMOD_META.SCMOD_SUPER is only available on GTK+ which is commonly the Windows key.
+/// If you are building a table, you might want to use SCMOD_NORM, which has the value 0, to mean no modifiers.
+/// </remarks>
+public class KeyModifier(SciMsg SCK_KeyCode, SciMsg SCMOD_modifier)
 {
-    private readonly int value;
-
-    /// <summary>
-    /// The key code is a visible or control character or a key from the SCK_* enumeration, which contains:
-    /// SCK_ADD, SCK_BACK, SCK_DELETE, SCK_DIVIDE, SCK_DOWN, SCK_END, SCK_ESCAPE, SCK_HOME, SCK_INSERT, SCK_LEFT, SCK_MENU, SCK_NEXT(Page Down), SCK_PRIOR(Page Up),
-    /// SCK_RETURN, SCK_RIGHT, SCK_RWIN, SCK_SUBTRACT, SCK_TAB, SCK_UP, and SCK_WIN.
-    ///
-    /// The modifiers are a combination of zero or more of SCMOD_ALT, SCMOD_CTRL, SCMOD_SHIFT, SCMOD_META, and SCMOD_SUPER.
-    /// On OS X, the Command key is mapped to SCMOD_CTRL and the Control key to SCMOD_META.SCMOD_SUPER is only available on GTK+ which is commonly the Windows key.
-    /// If you are building a table, you might want to use SCMOD_NORM, which has the value 0, to mean no modifiers.
-    /// </summary>
-    public KeyModifier(SciMsg SCK_KeyCode, SciMsg SCMOD_modifier) => value = (int)SCK_KeyCode | ((int)SCMOD_modifier << 16);
+    private readonly int value = (int)SCK_KeyCode | ((int)SCMOD_modifier << 16);
 
     public int Value => Value;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public struct CharacterRange
+public struct CharacterRange(int cpmin, int cpmax)
 {
-    public CharacterRange(int cpmin, int cpmax) { cpMin = cpmin; cpMax = cpmax; }
-    public int cpMin;
-    public int cpMax;
+    public int cpMin = cpmin;
+    public int cpMax = cpmax;
 }
 
-public class Cells
+public class Cells(char[] charactersAndStyles)
 {
-    public Cells(char[] charactersAndStyles) => Value = charactersAndStyles;
-
-    public char[] Value { get; }
+    public char[] Value { get; } = charactersAndStyles;
 }
 
 public class TextRange : IDisposable
