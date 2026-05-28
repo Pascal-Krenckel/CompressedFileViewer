@@ -17,7 +17,7 @@ namespace CompressedFileViewer;
 /// </summary>
 public class Preferences(bool decompressAll)
 {
-    private static readonly JsonSerializerOptions jsonSerializerOptions = new()
+    public static readonly JsonSerializerOptions JSON_SERIALIZER_OPTIONS = new()
     {
         AllowTrailingCommas = true,
         IgnoreReadOnlyFields = true,
@@ -122,7 +122,7 @@ public class Preferences(bool decompressAll)
     /// <param name="to">The stream to serialize to.</param>
     public void Serialize(Stream to)
     {
-        System.Text.Json.JsonSerializer.Serialize(to, this, jsonSerializerOptions);
+        System.Text.Json.JsonSerializer.Serialize(to, this, JSON_SERIALIZER_OPTIONS);
     }
 
     /// <summary>
@@ -196,7 +196,7 @@ public class Preferences(bool decompressAll)
     /// <returns>The deserialized preferences.</returns>
     public static Preferences Deserialize(Stream from)
     {
-        Preferences pref = System.Text.Json.JsonSerializer.Deserialize<Preferences>(from, jsonSerializerOptions)!;
+        Preferences pref = System.Text.Json.JsonSerializer.Deserialize<Preferences>(from, JSON_SERIALIZER_OPTIONS)!;
         pref.Version = Preferences.VERSION;
         if (pref.Version < 1)
         {
