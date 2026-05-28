@@ -36,15 +36,15 @@ public class XZSettings : CompressionSettings
     public bool MultiThreading { get; set; } = false;
     public int Threads { get; set; } = Environment.ProcessorCount;
 
-    private XZThreadedCompressOptions ThreadOptions => new() { BlockSize = (uint)BufferSize, Threads = Threads };
-    private XZThreadedDecompressOptions ThreadDecompressOptions => new() { Threads = Threads };
+    private XZParallelCompressOptions ThreadOptions => new() { BlockSize = (uint)BufferSize, Threads = Threads };
+    private XZParallelDecompressOptions ThreadDecompressOptions => new() { Threads = Threads };
 
     public override bool IsSupported => isSupported;
 
-    public override Stream GetCompressionStream(Stream outStream) => !MultiThreading ? new XZStream(outStream, CompressionOptions) : (Stream)new XZStream(outStream, CompressionOptions, ThreadOptions);
+    public override Stream GetCompressionStream(Stream outStream) => !MultiThreading ? new XZStream(outStream, CompressionOptions) : new XZStream(outStream, CompressionOptions, ThreadOptions);
     public override Stream GetDecompressionStream(Stream inStream) => !MultiThreading
             ? new XZStream(inStream, DecompressOptions)
-            : (Stream)new XZStream(inStream, DecompressOptions, ThreadDecompressOptions);
+            : new XZStream(inStream, DecompressOptions, ThreadDecompressOptions);
 
     public override void Initialize()
     {
