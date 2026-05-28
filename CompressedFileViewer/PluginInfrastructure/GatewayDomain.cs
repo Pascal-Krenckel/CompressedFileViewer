@@ -171,15 +171,17 @@ public class TextRange : IDisposable
     private void _readNativeStruct()
     {
         if (_ptrSciTextRange != nint.Zero)
-            _sciTextRange = (Sci_TextRange)Marshal.PtrToStructure(_ptrSciTextRange, typeof(Sci_TextRange))!;
+            _sciTextRange = Marshal.PtrToStructure<Sci_TextRange>(_ptrSciTextRange)!;
     }
 
     public void Dispose()
     {
         if (!_disposed)
         {
-            if (_sciTextRange.lpstrText != nint.Zero) Marshal.FreeHGlobal(_sciTextRange.lpstrText);
-            if (_ptrSciTextRange != nint.Zero) Marshal.FreeHGlobal(_ptrSciTextRange);
+            if (_sciTextRange.lpstrText != nint.Zero)
+                Marshal.FreeHGlobal(_sciTextRange.lpstrText);
+            if (_ptrSciTextRange != nint.Zero)
+                Marshal.FreeHGlobal(_ptrSciTextRange);
             _disposed = true;
         }
     }

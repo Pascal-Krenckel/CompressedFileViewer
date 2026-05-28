@@ -40,7 +40,7 @@ public static class UnmanagedExports
     [UnmanagedCallersOnly(EntryPoint = "beNotified", CallConvs = [typeof(CallConvCdecl)])]
     public static void BeNotified(nint notifyCode)
     {
-        ScNotification notification = (ScNotification)Marshal.PtrToStructure(notifyCode, typeof(ScNotification))!;
+        ScNotification notification = Marshal.PtrToStructure<ScNotification>(notifyCode)!;
         if (notification.Header.Code == (uint)NppMsg.NPPN_TBMODIFICATION)
         {
             PluginBase._funcItems.RefreshItems();
