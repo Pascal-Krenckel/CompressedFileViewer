@@ -50,7 +50,7 @@ public class FuncItems : IDisposable
     public FuncItems()
     {
         Items = [];
-        _sizeFuncItem = Marshal.SizeOf(typeof(FuncItem));
+        _sizeFuncItem = Marshal.SizeOf<FuncItem>();
         _shortCutKeys = [];
     }
 

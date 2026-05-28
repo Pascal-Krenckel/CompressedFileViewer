@@ -3027,7 +3027,7 @@ public class TextToFind : IDisposable
     private void _readNativeStruct()
     {
         if (_ptrSciTextToFind != nint.Zero)
-            _sciTextToFind = (Sci_TextToFind)Marshal.PtrToStructure(_ptrSciTextToFind, typeof(Sci_TextToFind))!;
+            _sciTextToFind = Marshal.PtrToStructure<Sci_TextToFind>(_ptrSciTextToFind)!;
     }
 
     private void _freeNativeString()
