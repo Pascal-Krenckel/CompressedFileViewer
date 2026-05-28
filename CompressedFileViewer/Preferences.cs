@@ -1,6 +1,8 @@
 ﻿using CompressedFileViewer.Settings;
 using System.IO;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 namespace CompressedFileViewer;
@@ -15,6 +17,18 @@ namespace CompressedFileViewer;
 /// </summary>
 public class Preferences(bool decompressAll)
 {
+    private static readonly JsonSerializerOptions jsonSerializerOptions = new()
+    {
+        AllowTrailingCommas = true,
+        IgnoreReadOnlyFields = true,
+        IgnoreReadOnlyProperties = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        Converters = {
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, true)
+        },
+        WriteIndented = true,
+    };
     public const int VERSION = 5;
 
     #region Properties
@@ -36,6 +50,7 @@ public class Preferences(bool decompressAll)
     /// <summary>
     /// Gets the compression algorithms available.
     /// </summary>
+    [JsonIgnore]
     public IEnumerable<CompressionSettings> CompressionAlgorithms => GetType().GetProperties()
                             .Where(m => m.PropertyType.IsSubclassOf(typeof(CompressionSettings)))
                             .Select(m => (CompressionSettings)m.GetValue(this)!)
@@ -44,16 +59,19 @@ public class Preferences(bool decompressAll)
     /// <summary>
     /// Gets the active compression algorithms that the plugin should switch through
     /// </summary>
+    [JsonIgnore]
     public IEnumerable<CompressionSettings> ActiveCompressionAlgorithms => SupportedCompressionAlgorithms.Where(comp => comp.IsActive);
 
     /// <summary>
     /// Gets the enabled compression algorithms.
     /// </summary>
+    [JsonIgnore]
     public IEnumerable<CompressionSettings> EnabledCompressionAlgorithms => CompressionAlgorithms.Where(comp => comp.IsEnabled);
 
     /// <summary>
     /// Gets the compression algorithms that are supported.
     /// </summary>
+    [JsonIgnore]
     public IEnumerable<CompressionSettings> SupportedCompressionAlgorithms => EnabledCompressionAlgorithms.Where(alg => alg.IsSupported);
     #endregion
 
@@ -72,6 +90,26 @@ public class Preferences(bool decompressAll)
     /// Serializes the preferences to a file.
     /// </summary>
     /// <param name="path">The file path to serialize to.</param>
+    public void SerializeXML(string path)
+    {
+        using Stream streams = new FileStream(path, FileMode.Create, FileAccess.Write);
+        SerializeXML(streams);
+    }
+
+    /// <summary>
+    /// Serializes the preferences to a stream.
+    /// </summary>
+    /// <param name="to">The stream to serialize to.</param>
+    public void SerializeXML(Stream to)
+    {
+        XmlSerializer serializer = new(typeof(Preferences));
+        serializer.Serialize(to, this);
+    }
+
+    /// <summary>
+    /// Serializes the preferences to a file.
+    /// </summary>
+    /// <param name="path">The file path to serialize to.</param>
     public void Serialize(string path)
     {
         using Stream streams = new FileStream(path, FileMode.Create, FileAccess.Write);
@@ -84,8 +122,49 @@ public class Preferences(bool decompressAll)
     /// <param name="to">The stream to serialize to.</param>
     public void Serialize(Stream to)
     {
+        System.Text.Json.JsonSerializer.Serialize(to, this, jsonSerializerOptions);
+    }
+
+    /// <summary>
+    /// Deserializes the preferences from a file.
+    /// </summary>
+    /// <param name="path">The file path to deserialize from.</param>
+    /// <returns>The deserialized preferences.</returns>
+    public static Preferences DeserializeXML(string path)
+    {
+        using Stream streams = new FileStream(path, FileMode.Open, FileAccess.Read);
+        return DeserializeXML(streams);
+    }
+
+    /// <summary>
+    /// Deserializes the preferences from a stream.
+    /// </summary>
+    /// <param name="from">The stream to deserialize from.</param>
+    /// <returns>The deserialized preferences.</returns>
+    public static Preferences DeserializeXML(Stream from)
+    {
         XmlSerializer serializer = new(typeof(Preferences));
-        serializer.Serialize(to, this);
+        Preferences pref = (Preferences)serializer.Deserialize(from)!;
+        pref.Version = Preferences.VERSION;
+        if (pref.Version < 1)
+        {
+            pref.BZip2Settings = Default.BZip2Settings;
+            pref.GZipSettings = Default.GZipSettings;
+        }
+        if (pref.Version < 2)
+        {
+            pref.ZstdSettings = Default.ZstdSettings;
+        }
+        if (pref.Version < 3)
+        {
+            pref.XZSettings = Default.XZSettings;
+        }
+        if (pref.Version < 4)
+        {
+            pref.BrotliSettings = Default.BrotliSettings;
+        }
+
+        return pref;
     }
 
     /// <summary>
@@ -95,8 +174,19 @@ public class Preferences(bool decompressAll)
     /// <returns>The deserialized preferences.</returns>
     public static Preferences Deserialize(string path)
     {
-        using Stream streams = new FileStream(path, FileMode.Open, FileAccess.Read);
-        return Deserialize(streams);
+        using Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+        try
+        {
+
+            return Deserialize(stream);
+        }
+        catch(Exception ex)
+        {
+            Logging.Log("Failed to deserialize preferences with JSON, trying XML deserialization as fallback");
+            Logging.Log(ex);
+            _ = stream.Seek(0, SeekOrigin.Begin);
+            return DeserializeXML(stream);
+        }
     }
 
     /// <summary>
@@ -106,8 +196,7 @@ public class Preferences(bool decompressAll)
     /// <returns>The deserialized preferences.</returns>
     public static Preferences Deserialize(Stream from)
     {
-        XmlSerializer serializer = new(typeof(Preferences));
-        Preferences pref = (Preferences)serializer.Deserialize(from)!;
+        Preferences pref = System.Text.Json.JsonSerializer.Deserialize<Preferences>(from, jsonSerializerOptions)!;
         pref.Version = Preferences.VERSION;
         if (pref.Version < 1)
         {
