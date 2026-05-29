@@ -1,0 +1,59 @@
+name: CI_build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    env:
+      Solution: CompressedFileViewer.sln
+    strategy:
+      fail-fast: false
+      matrix:
+        build_configuration: [Release, Debug]
+        build_platform: [x64, x86]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v6
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v3
+
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v4
+
+    - name: Setup dotnet for ${{ matrix.build_platform }}
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: |
+          8.0.x
+        architecture: ${{ matrix.build_platform }}
+
+    - name: Nuget restore solution
+      working-directory: .
+      run: nuget restore $env:Solution
+
+    - name: Dotnet restore dependencies
+      run: dotnet restore $env:Solution --arch ${{ matrix.build_platform }}
+
+    - name: MSBuild of plugin dll
+      run: msbuild $env:Solution /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}"
+
+    - uses: olegtarasov/get-tag@v2.1.4
+      id: tagName
+
+    - name: Archive artifacts for ${{ matrix.build_platform }}
+      if: matrix.build_configuration == 'Release'
+      uses: actions/upload-artifact@v7
+      with:
+          name: CompressedFileViewer_${{ steps.tagName.outputs.tag }}_${{ matrix.build_platform }}.zip
+          path: CompressedFileViewer\publish\CompressedFileViewer${{ matrix.build_platform }}.zip
+
+    - name: Create release on tagging
+      uses: softprops/action-gh-release@v3
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+          files: CompressedFileViewer_${{ steps.tagName.outputs.tag }}_${{ matrix.build_platform }}.zip
+
