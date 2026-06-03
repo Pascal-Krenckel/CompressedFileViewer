@@ -18,11 +18,13 @@
 		<Copyright>Copyright © Pascal Krenckel 2026</Copyright>
 		<PackageProjectUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Pascal-Krenckel/CompressedFileViewer</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>		
+		<RepositoryType>git</RepositoryType>
+		<Version>5.1.0</Version>
 		<AssemblyVersion>5.1.0.0</AssemblyVersion>
 		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageIcon>gzip-filled.png</PackageIcon>
+		<EnableDynamicLoading>true</EnableDynamicLoading>
 		<ApplicationIcon>icons\gzip.ico</ApplicationIcon>
 	</PropertyGroup>
 	<ItemGroup>
