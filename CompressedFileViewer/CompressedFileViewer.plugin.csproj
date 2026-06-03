@@ -99,40 +99,33 @@
              SDK Discovery
          ========================= -->
 	<Target Name="FindSdkVersion" BeforeTargets="Build">
-		<Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Build\Find-SdkVersion.ps1&quot;" ConsoleToMSBuild="true">
+		<Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Build\Find-SdkVersion.ps1&quot;" ConsoleToMSBuild="true" IgnoreExitCode="true">
 			<Output TaskParameter="ConsoleOutput" PropertyName="WindowsSdkVersion" />
 		</Exec>
 
 		<PropertyGroup>
 			<WindowsSdkVersion>$([System.String]::Copy('$(WindowsSdkVersion)').Trim())</WindowsSdkVersion>
 			<WindowsKitsRoot>$([System.String]::Copy('$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots@KitsRoot10)').Trim())</WindowsKitsRoot>
+			<RcExePath>$(WindowsKitsRoot)bin\$(WindowsSdkVersion)\x64\rc.exe</RcExePath>
 		</PropertyGroup>
 	</Target>
-
-	<!-- =========================
-           Resource Properties
-         ========================= -->
-	<PropertyGroup>
-		<Win32Resources>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)$(DnneNativeBinaryName).res</Win32Resources>
-		<DnneLinkerUserFlags>$(Win32Resources)</DnneLinkerUserFlags>
-
-		<VersionMajor>$([System.Version]::Parse('$(AssemblyVersion)').Major)</VersionMajor>
-		<VersionMinor>$([System.Version]::Parse('$(AssemblyVersion)').Minor)</VersionMinor>
-		<VersionBuild>$([System.Version]::Parse('$(AssemblyVersion)').Build)</VersionBuild>
-		<VersionRevision>$([System.Version]::Parse('$(AssemblyVersion)').Revision)</VersionRevision>
-	</PropertyGroup>
 
 	<!-- =========================
            RC Compilation
          ========================= -->
 	<Target Name="CompileResources" BeforeTargets="CoreCompile" DependsOnTargets="FindSdkVersion">
-
-		<PropertyGroup>
-			<RcExePath>$(WindowsKitsRoot)bin\$(WindowsSdkVersion)\x64\rc.exe</RcExePath>
+		<Message Text="RC disabled (rc.exe not found)" Condition="!Exists('$(RcExePath)')" Importance="High" />
+		<PropertyGroup Condition="Exists('$(RcExePath)')">
 			<WindowsSdkInclude>$(WindowsKitsRoot)Include\$(WindowsSdkVersion)\um;$(WindowsKitsRoot)Include\$(WindowsSdkVersion)\shared</WindowsSdkInclude>
+			<Win32Resources>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)$(DnneNativeBinaryName).res</Win32Resources>
+			<DnneLinkerUserFlags>$(Win32Resources)</DnneLinkerUserFlags>
+			<VersionMajor>$([System.Version]::Parse('$(AssemblyVersion)').Major)</VersionMajor>
+			<VersionMinor>$([System.Version]::Parse('$(AssemblyVersion)').Minor)</VersionMinor>
+			<VersionBuild>$([System.Version]::Parse('$(AssemblyVersion)').Build)</VersionBuild>
+			<VersionRevision>$([System.Version]::Parse('$(AssemblyVersion)').Revision)</VersionRevision>
 		</PropertyGroup>
 
-		<Exec Command="&quot;$(RcExePath)&quot; /I &quot;$(WindowsSdkInclude)&quot; /d VERSION_MAJOR=$(VersionMajor) /d VERSION_MINOR=$(VersionMinor) /d VERSION_BUILD=$(VersionBuild) /d VERSION_REVISION=$(VersionRevision) /d COMMENTS=&quot;\&quot;$(Description)\&quot;&quot; /d COMPANY_NAME=&quot;\&quot;$(Company)\&quot;&quot; /d FILE_DESCRIPTION=&quot;\&quot;$(Description)\&quot;&quot; /d FILE_VERSION=&quot;\&quot;$(AssemblyVersion)\&quot;&quot; /d INTERNAL_NAME=&quot;\&quot;$(DnneNativeBinaryName).dll\&quot;&quot; /d LEGAL_COPYRIGHT=&quot;\&quot;$(Copyright)\&quot;&quot; /d ORIGINAL_FILENAME=&quot;\&quot;$(DnneNativeBinaryName).dll\&quot;&quot; /d PRODUCT_NAME=&quot;\&quot;$(Product)\&quot;&quot; /d PRODUCT_VERSION=&quot;\&quot;$(Version)\&quot;&quot; /fo &quot;$(Win32Resources)&quot; &quot;$(MSBuildProjectDirectory)\Build\$(DnneNativeBinaryName).rc&quot;" />
+		<Exec Condition="Exists('$(RcExePath)')" Command="&quot;$(RcExePath)&quot; /I &quot;$(WindowsSdkInclude)&quot; /d VERSION_MAJOR=$(VersionMajor) /d VERSION_MINOR=$(VersionMinor) /d VERSION_BUILD=$(VersionBuild) /d VERSION_REVISION=$(VersionRevision) /d COMMENTS=&quot;\&quot;$(Description)\&quot;&quot; /d COMPANY_NAME=&quot;\&quot;$(Company)\&quot;&quot; /d FILE_DESCRIPTION=&quot;\&quot;$(Description)\&quot;&quot; /d FILE_VERSION=&quot;\&quot;$(AssemblyVersion)\&quot;&quot; /d INTERNAL_NAME=&quot;\&quot;$(DnneNativeBinaryName).dll\&quot;&quot; /d LEGAL_COPYRIGHT=&quot;\&quot;$(Copyright)\&quot;&quot; /d ORIGINAL_FILENAME=&quot;\&quot;$(DnneNativeBinaryName).dll\&quot;&quot; /d PRODUCT_NAME=&quot;\&quot;$(Product)\&quot;&quot; /d PRODUCT_VERSION=&quot;\&quot;$(Version)\&quot;&quot; /fo &quot;$(Win32Resources)&quot; &quot;$(MSBuildProjectDirectory)\Build\$(DnneNativeBinaryName).rc&quot;" />
 
 	</Target>
 
