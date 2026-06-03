@@ -28,20 +28,20 @@
 		<ApplicationIcon>icons\gzip.ico</ApplicationIcon>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Compile Remove="publish\**" />
-	  <EmbeddedResource Remove="publish\**" />
-	  <None Remove="publish\**" />
-	  <Page Remove="publish\**" />
+		<Compile Remove="publish\**" />
+		<EmbeddedResource Remove="publish\**" />
+		<None Remove="publish\**" />
+		<Page Remove="publish\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="icons\gzip-filled16.png" />
-	  <None Remove="icons\gzip.png" />
-	 
+		<None Remove="icons\gzip-filled16.png" />
+		<None Remove="icons\gzip.png" />
+
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="icons\gzip-filled16.png" />
+		<EmbeddedResource Include="icons\gzip-filled16.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -53,34 +53,34 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Resource Include="icons\gzip.png" />
+		<Resource Include="icons\gzip.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Windows\BrotliSettings.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Windows\BZip2SettingsDialog.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Windows\DecompressDialog.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Windows\XZSettingsDialog.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Windows\ZstdSettingsDialog.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
+		<Compile Update="Windows\BrotliSettings.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Windows\BZip2SettingsDialog.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Windows\DecompressDialog.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Windows\XZSettingsDialog.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Windows\ZstdSettingsDialog.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="icons\gzip-filled.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Update="icons\gzip-filled.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
-    
+
 	<PropertyGroup Condition="'$(Platform)'=='x86'">
 		<RuntimeIdentifier>win-x86</RuntimeIdentifier>
 		<PlatformTarget>x86</PlatformTarget>
@@ -93,21 +93,55 @@
 		<NppDir>$(NppDir64)</NppDir>
 	</PropertyGroup>
 
+
+
+	<!-- =========================
+             SDK Discovery
+         ========================= -->
+	<Target Name="FindSdkVersion" BeforeTargets="Build">
+		<Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Build\Find-SdkVersion.ps1&quot;" ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="WindowsSdkVersion" />
+		</Exec>
+
+		<PropertyGroup>
+			<WindowsSdkVersion>$([System.String]::Copy('$(WindowsSdkVersion)').Trim())</WindowsSdkVersion>
+			<WindowsKitsRoot>$([System.String]::Copy('$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots@KitsRoot10)').Trim())</WindowsKitsRoot>
+		</PropertyGroup>
+	</Target>
+
+	<!-- =========================
+           Resource Properties
+         ========================= -->
 	<PropertyGroup>
-		<!-- https://github.com/AaronRobinsonMSFT/DNNE/issues/197#issuecomment-2621208585 -->
 		<Win32Resources>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)$(DnneNativeBinaryName).res</Win32Resources>
 		<DnneLinkerUserFlags>$(Win32Resources)</DnneLinkerUserFlags>
+
+		<VersionMajor>$([System.Version]::Parse('$(AssemblyVersion)').Major)</VersionMajor>
+		<VersionMinor>$([System.Version]::Parse('$(AssemblyVersion)').Minor)</VersionMinor>
+		<VersionBuild>$([System.Version]::Parse('$(AssemblyVersion)').Build)</VersionBuild>
+		<VersionRevision>$([System.Version]::Parse('$(AssemblyVersion)').Revision)</VersionRevision>
 	</PropertyGroup>
 
-	<Target Name="CompileWin32Resources" BeforeTargets="CoreCompile" Condition="!Exists('$(Win32Resources)')">
-		<Exec Command="rc.exe /fo $(Win32Resources) $(MSBuildProjectDirectory)\$(DnneNativeBinaryName).rc"/>
+	<!-- =========================
+           RC Compilation
+         ========================= -->
+	<Target Name="CompileResources" BeforeTargets="CoreCompile" DependsOnTargets="FindSdkVersion">
+
+		<PropertyGroup>
+			<RcExePath>$(WindowsKitsRoot)bin\$(WindowsSdkVersion)\x64\rc.exe</RcExePath>
+			<WindowsSdkInclude>$(WindowsKitsRoot)Include\$(WindowsSdkVersion)\um;$(WindowsKitsRoot)Include\$(WindowsSdkVersion)\shared</WindowsSdkInclude>
+		</PropertyGroup>
+
+		<Exec Command="&quot;$(RcExePath)&quot; /I &quot;$(WindowsSdkInclude)&quot; /d VERSION_MAJOR=$(VersionMajor) /d VERSION_MINOR=$(VersionMinor) /d VERSION_BUILD=$(VersionBuild) /d VERSION_REVISION=$(VersionRevision) /d COMMENTS=&quot;\&quot;$(Description)\&quot;&quot; /d COMPANY_NAME=&quot;\&quot;$(Company)\&quot;&quot; /d FILE_DESCRIPTION=&quot;\&quot;$(Description)\&quot;&quot; /d FILE_VERSION=&quot;\&quot;$(AssemblyVersion)\&quot;&quot; /d INTERNAL_NAME=&quot;\&quot;$(DnneNativeBinaryName).dll\&quot;&quot; /d LEGAL_COPYRIGHT=&quot;\&quot;$(Copyright)\&quot;&quot; /d ORIGINAL_FILENAME=&quot;\&quot;$(DnneNativeBinaryName).dll\&quot;&quot; /d PRODUCT_NAME=&quot;\&quot;$(Product)\&quot;&quot; /d PRODUCT_VERSION=&quot;\&quot;$(Version)\&quot;&quot; /fo &quot;$(Win32Resources)&quot; &quot;$(MSBuildProjectDirectory)\Build\$(DnneNativeBinaryName).rc&quot;" />
+
 	</Target>
 
 	<Target Name="CopyFiles" AfterTargets="PostBuildEvent" Condition=" Exists('$(NppDir)\plugins') AND '$(NppDir)' != '' ">
 		<ItemGroup>
 			<Binaries Include="$(ProjectDir)$(OutDir)**\*.*" />
 		</ItemGroup>
-		<RemoveDir Directories="$(NppDir)\plugins\CompressedFileViewer" /> <!-- Remove old files -->
+		<RemoveDir Directories="$(NppDir)\plugins\CompressedFileViewer" />
+		<!-- Remove old files -->
 		<MakeDir Directories="$(NppDir)\plugins\CompressedFileViewer" />
 		<Copy SourceFiles="@(Binaries)" DestinationFolder="$(NppDir)\plugins\CompressedFileViewer" />
 	</Target>
