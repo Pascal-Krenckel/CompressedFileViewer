@@ -93,6 +93,16 @@
 		<NppDir>$(NppDir64)</NppDir>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<!-- https://github.com/AaronRobinsonMSFT/DNNE/issues/197#issuecomment-2621208585 -->
+		<Win32Resources>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)$(DnneNativeBinaryName).res</Win32Resources>
+		<DnneLinkerUserFlags>$(Win32Resources)</DnneLinkerUserFlags>
+	</PropertyGroup>
+
+	<Target Name="CompileWin32Resources" BeforeTargets="CoreCompile" Condition="!Exists('$(Win32Resources)')">
+		<Exec Command="rc.exe /fo $(Win32Resources) $(MSBuildProjectDirectory)\$(DnneNativeBinaryName).rc"/>
+	</Target>
+
 	<Target Name="CopyFiles" AfterTargets="PostBuildEvent" Condition=" Exists('$(NppDir)\plugins') AND '$(NppDir)' != '' ">
 		<ItemGroup>
 			<Binaries Include="$(ProjectDir)$(OutDir)**\*.*" />
