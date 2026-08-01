@@ -25,7 +25,7 @@ jobs:
       uses: nuget/setup-nuget@v4
 
     - name: Setup dotnet for ${{ matrix.build_platform }}
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: |
           8.0.x
