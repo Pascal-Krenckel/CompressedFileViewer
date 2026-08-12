@@ -28,7 +28,7 @@ internal class FileHelper
                 FileTracker.Include(notification.Header.IdFrom, path, encoding, sourceCompression);
                 return;
             }
-            Encoding? enc = CompressionHelper.TryDecompress(gzContentStream, sourceCompression);
+            Encoding? enc = CompressionHelper.TryDecompress(gzContentStream, sourceCompression, true);
             if (enc != null)
             { // was able to decompress
                 Logging.Log(logEntry);
@@ -43,7 +43,7 @@ internal class FileHelper
             foreach (CompressionSettings compression in Preferences.ActiveCompressionAlgorithms)
             {
                 _ = gzContentStream.Seek(0, SeekOrigin.Begin);
-                Encoding? enc = CompressionHelper.TryDecompress(gzContentStream, compression);
+                Encoding? enc = CompressionHelper.TryDecompress(gzContentStream, compression,false);
                 if (enc != null)
                 { // was able to decompress
                     _ = subTree.AppendMessage($"Compression found: {compression.AlgorithmName}");

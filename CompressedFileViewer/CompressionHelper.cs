@@ -162,11 +162,15 @@ public static class CompressionHelper
         }
     }
 
-    public static Encoding? TryDecompress(Stream contentStream, CompressionSettings compression)
+    public static Encoding? TryDecompress(Stream contentStream, CompressionSettings compression, bool allowEmptyOutput)
     {
         try
         {
             using MemoryStream decodedContentStream = CompressionHelper.Decode(contentStream, compression);
+            if (!allowEmptyOutput && decodedContentStream.Length == 0)
+                return null;
+            
+
             Encoding encoding = CompressionHelper.SetDecodedText(decodedContentStream);
 
             Plugin.NppGateway.SendMenuEncoding(NppEncoding.UTF8);
