@@ -48,12 +48,24 @@ jobs:
           /p:configuration="${{ matrix.build_configuration }}"
           /p:platform="${{ matrix.build_platform }}"
 
+      - name: Rename Release artifact
+        if: matrix.build_configuration == 'Release'
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}"
+          $platform = "${{ matrix.build_platform }}".ToUpper()
+
+          $source = "CompressedFileViewer\publish\CompressedFileViewer${{ matrix.build_platform }}.zip"
+          $destination = "CompressedFileViewer\publish\CompressedFileViewer_${platform}_${version}.zip"
+
+          Rename-Item -Path $source -NewName (Split-Path $destination -Leaf)
+
       - name: Archive Release artifact
         if: matrix.build_configuration == 'Release'
         uses: actions/upload-artifact@v7
         with:
           name: CompressedFileViewer_${{ matrix.build_platform }}
-          path: CompressedFileViewer\publish\CompressedFileViewer${{ matrix.build_platform }}.zip
+          path: CompressedFileViewer\publish\CompressedFileViewer_${{ matrix.build_platform }}_${{ github.ref_name }}.zip
 
   release:
     name: Create GitHub Release
